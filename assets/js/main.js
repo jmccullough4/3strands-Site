@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 setStatus('Thank you! Your message has been sent. We will be in touch soon.', 'is-success');
             } catch (error) {
                 console.error('Contact form submission failed:', error);
-                setStatus('We could not send your message. Please try again or call us at (561) 917-9047.', 'is-error');
+                setStatus('We could not send your message. Please try again or email info@3strands.co or call us at (561) 917-9047.', 'is-error');
             } finally {
                 if (submitButton) {
                     submitButton.disabled = false;
