@@ -51,4 +51,68 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    const contactForm = document.querySelector('.contact-form');
+
+    if (contactForm) {
+        const statusEl = contactForm.querySelector('.form-status');
+        const submitButton = contactForm.querySelector('button[type="submit"]');
+
+        const setStatus = (message, type) => {
+            if (!statusEl) {
+                return;
+            }
+
+            statusEl.textContent = message;
+            statusEl.classList.remove('is-success', 'is-error');
+
+            if (type) {
+                statusEl.classList.add(type);
+            }
+        };
+
+        contactForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            if (!contactForm.checkValidity()) {
+                contactForm.reportValidity();
+                return;
+            }
+
+            setStatus('Sending your message…', null);
+
+            if (submitButton) {
+                submitButton.disabled = true;
+            }
+
+            const formData = new FormData(contactForm);
+            formData.append('_replyto', formData.get('email') || '');
+
+            try {
+                const response = await fetch(contactForm.action, {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                    },
+                    body: formData,
+                });
+
+                const payload = await response.json().catch(() => ({}));
+
+                if (!response.ok || payload.success !== 'true') {
+                    throw new Error(payload.message || `Request failed with status ${response.status}`);
+                }
+
+                contactForm.reset();
+                setStatus('Thank you! Your message has been sent. We will be in touch soon.', 'is-success');
+            } catch (error) {
+                console.error('Contact form submission failed:', error);
+                setStatus('We could not send your message. Please try again or call us at (561) 917-9047.', 'is-error');
+            } finally {
+                if (submitButton) {
+                    submitButton.disabled = false;
+                }
+            }
+        });
+    }
 });

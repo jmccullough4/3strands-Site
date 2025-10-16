@@ -185,12 +185,12 @@
                     <h2 id="contact-title">Contact Us</h2>
                     <p>Share how we can serve you. Whether you need a custom cut sheet, ministry partnership, or farm tour, our team is ready to help.</p>
                     <div class="contact-details">
-                        <p><strong>Email:</strong> <a href="mailto:info@3strands.co">info@3strands.co</a></p>
+                        <p><strong>Email:</strong> info@3strand.co</p>
                         <p><strong>Phone:</strong> <a href="tel:+15619179047">(561) 917-9047</a></p>
                         <p><strong>Service Area:</strong> State of Florida</p>
                     </div>
                 </div>
-                <form class="contact-form" action="mailto:info@3strands.co" method="post" enctype="text/plain">
+                <form class="contact-form" action="https://formsubmit.co/ajax/info@3strand.co" method="post" novalidate>
                     <div class="form-group">
                         <label for="name">Name</label>
                         <input type="text" id="name" name="name" required>
@@ -207,8 +207,11 @@
                         <label for="message">How can we serve you?</label>
                         <textarea id="message" name="message" rows="5" required></textarea>
                     </div>
+                    <input type="hidden" name="_subject" value="New inquiry from 3 Strands Cattle Co. website">
+                    <input type="hidden" name="_captcha" value="false">
                     <button type="submit" class="cta-button">Send Message</button>
-                    <p class="form-footnote">Submitting will open your email client to finalize your message.</p>
+                    <p class="form-footnote">We&rsquo;ll follow up within one business day.</p>
+                    <p class="form-status" role="status" aria-live="polite"></p>
                 </form>
             </div>
         </section>
