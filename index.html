@@ -11,7 +11,7 @@
     <meta property="og:image:alt" content="3 Strands Cattle Co. logo">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
@@ -24,7 +24,11 @@
                     <p>Faithful. Local. Premium.</p>
                 </div>
             </div>
-            <nav class="primary-nav" aria-label="Main navigation">
+            <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation">
+                <span class="nav-toggle-label">Menu</span>
+                <span class="nav-toggle-icon" aria-hidden="true"></span>
+            </button>
+            <nav class="primary-nav" id="primary-navigation" aria-label="Main navigation">
                 <ul>
                     <li><a href="#mission">Mission</a></li>
                     <li><a href="#offerings">Offerings</a></li>
@@ -42,7 +46,7 @@
                 <div>
                     <p class="eyebrow">Premium Beef • Pork • Chicken</p>
                     <h2 id="hero-title">Rooted in Faith. Raised with Integrity.</h2>
-                    <p class="hero-copy">From pasture to plate, we steward every animal with care, partnering with local farmers to deliver grass-fed beef, heritage pork, and cage-free chicken that you can serve with confidence.</p>
+                    <p class="hero-copy">From pasture to plate, we steward every animal with care, partnering with local farmers across Florida to deliver grass-fed beef, heritage pork, and cage-free chicken that you can serve with confidence.</p>
                     <div class="hero-actions">
                         <a class="cta-button" href="#offerings">Explore Offerings</a>
                         <a class="ghost-button" href="#mission">Our Mission</a>
@@ -160,6 +164,21 @@
             </div>
         </section>
 
+        <section class="service-area" aria-labelledby="service-area-title">
+            <div class="container service-area-content">
+                <div>
+                    <p class="eyebrow">Serving the Sunshine State</p>
+                    <h2 id="service-area-title">Florida-Wide Delivery &amp; Partnerships</h2>
+                    <p class="service-area-copy">From the Panhandle to South Florida, we coordinate cold-chain logistics to keep your beef, pork, and chicken pristine. Ask about weekly coastal deliveries, ministry drop-offs, and chef collaborations in every major metro.</p>
+                </div>
+                <ul class="service-area-list">
+                    <li><strong>Direct to Home:</strong> Family freezers &amp; bulk shares statewide</li>
+                    <li><strong>Hospitality Partners:</strong> Resorts, country clubs, and farm-to-table restaurants</li>
+                    <li><strong>Ministry Support:</strong> Church events, outreach programs, and food banks</li>
+                </ul>
+            </div>
+        </section>
+
         <section id="contact" class="contact" aria-labelledby="contact-title">
             <div class="container contact-grid">
                 <div>
@@ -167,8 +186,8 @@
                     <p>Share how we can serve you. Whether you need a custom cut sheet, ministry partnership, or farm tour, our team is ready to help.</p>
                     <div class="contact-details">
                         <p><strong>Email:</strong> <a href="mailto:info@3strands.co">info@3strands.co</a></p>
-                        <p><strong>Phone:</strong> <a href="tel:+19139991337">(913) 999-1337</a></p>
-                        <p><strong>Service Area:</strong> Greater Kansas City &amp; surrounding communities</p>
+                        <p><strong>Phone:</strong> <a href="tel:+15619179047">(561) 917-9047</a></p>
+                        <p><strong>Service Area:</strong> State of Florida</p>
                     </div>
                 </div>
                 <form class="contact-form" action="mailto:info@3strands.co" method="post" enctype="text/plain">
