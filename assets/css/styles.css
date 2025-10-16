@@ -170,7 +170,7 @@ a:focus {
     content: '';
     position: absolute;
     inset: 0;
-    background-image: url('../img/logo.svg');
+    background-image: url('../img/logo.png');
     background-repeat: no-repeat;
     background-position: right -6rem top -6rem;
     background-size: 28rem;
