@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 chatButton.addEventListener('click', openOverlay);
             }
 
-            setChatStatus('Live chat is online. Launch the window to connect with our team instantly.', 'is-live');
+            setChatStatus('Live chat is online—launch the window to start a conversation with our Florida distribution team.', 'is-live');
         } else {
             setChatStatus('Live chat is almost ready—host Element on your server and paste its embed URL into the data attribute.', null);
 

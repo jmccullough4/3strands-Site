@@ -40,4 +40,6 @@ The live chat section now favors a fully self-hosted Matrix stack so conversatio
 
    The `data-matrix-room-name` attribute controls the accessible label and window title.
 
+   The production site is preconfigured to load `https://chat.3strands.co/#/room/#support:3strands.co?via=3strands.co`, which targets the `#support:3strands.co` room hosted on your Matrix homeserver. If you rename the room or adjust routing, update the attribute to match.
+
 With the embed URL in place, the "Launch Live Chat" button renders an on-site overlay that loads your self-hosted Element client. Guests can converse from the website, and your employees can respond (with alerts) via their Element apps. Leave the `data-matrix-embed-url` empty during staging to keep the button disabled while infrastructure is prepared.
