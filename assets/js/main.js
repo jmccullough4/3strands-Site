@@ -99,8 +99,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const payload = await response.json().catch(() => ({}));
 
-                if (!response.ok || payload.success !== 'true') {
+                if (!response.ok) {
                     throw new Error(payload.message || `Request failed with status ${response.status}`);
+                }
+
+                if (Object.prototype.hasOwnProperty.call(payload, 'success')) {
+                    const successValue = payload.success;
+                    const isSuccessful = successValue === true || successValue === 'true';
+
+                    if (!isSuccessful) {
+                        throw new Error(payload.message || 'Form submission was rejected by the email service.');
+                    }
                 }
 
                 contactForm.reset();
@@ -114,104 +123,5 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
-    }
-
-    const liveChatContainer = document.querySelector('.live-chat-content[data-chat-provider="matrix"]');
-
-    if (liveChatContainer) {
-        const embedUrl = (liveChatContainer.getAttribute('data-matrix-embed-url') || '').trim();
-        const roomName = (liveChatContainer.getAttribute('data-matrix-room-name') || '3 Strands Cattle Co. Live Chat').trim();
-        const chatButton = liveChatContainer.querySelector('[data-chat-toggle]');
-        const chatStatus = liveChatContainer.querySelector('[data-chat-status]');
-
-        const setChatStatus = (message, modifier) => {
-            if (!chatStatus) {
-                return;
-            }
-
-            chatStatus.textContent = message;
-            chatStatus.classList.remove('is-live');
-
-            if (modifier) {
-                chatStatus.classList.add(modifier);
-            }
-        };
-
-        const openOverlay = () => {
-            const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-            const overlay = document.createElement('div');
-            overlay.classList.add('live-chat-overlay');
-
-            const frame = document.createElement('div');
-            frame.classList.add('live-chat-frame');
-            frame.setAttribute('role', 'dialog');
-            frame.setAttribute('aria-modal', 'true');
-
-            if (roomName) {
-                frame.setAttribute('aria-label', roomName);
-            }
-
-            const closeButton = document.createElement('button');
-            closeButton.type = 'button';
-            closeButton.classList.add('live-chat-close');
-            closeButton.setAttribute('aria-label', 'Close live chat');
-            closeButton.textContent = '×';
-
-            const iframe = document.createElement('iframe');
-            iframe.src = embedUrl;
-            iframe.title = roomName || 'Live chat';
-            iframe.loading = 'lazy';
-            iframe.setAttribute('allow', 'microphone; camera; clipboard-read; clipboard-write');
-
-            const teardown = () => {
-                document.removeEventListener('keydown', handleKeydown);
-                overlay.remove();
-
-                if (previousFocus) {
-                    previousFocus.focus({ preventScroll: true });
-                }
-            };
-
-            const handleKeydown = (event) => {
-                if (event.key === 'Escape') {
-                    teardown();
-                }
-            };
-
-            closeButton.addEventListener('click', teardown);
-
-            overlay.addEventListener('click', (event) => {
-                if (event.target === overlay) {
-                    teardown();
-                }
-            });
-
-            document.addEventListener('keydown', handleKeydown);
-
-            frame.appendChild(closeButton);
-            frame.appendChild(iframe);
-            overlay.appendChild(frame);
-            document.body.appendChild(overlay);
-
-            requestAnimationFrame(() => {
-                overlay.classList.add('is-open');
-                closeButton.focus({ preventScroll: true });
-            });
-        };
-
-        if (embedUrl) {
-            if (chatButton) {
-                chatButton.disabled = false;
-                chatButton.addEventListener('click', openOverlay);
-            }
-
-            setChatStatus('Live chat is online—launch the window to start a conversation with our Florida distribution team.', 'is-live');
-        } else {
-            setChatStatus('Live chat is almost ready—host Element on your server and paste its embed URL into the data attribute.', null);
-
-            if (chatButton) {
-                chatButton.disabled = true;
-            }
-        }
     }
 });
