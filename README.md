@@ -22,10 +22,22 @@ The "Contact Us" form posts to [FormSubmit](https://formsubmit.co), which relays
 
 ## Live chat configuration
 
-The live chat section is prewired for [Crisp](https://crisp.chat/). To enable it:
+The live chat section now favors a fully self-hosted Matrix stack so conversations stay under your control and free of recurring subscription costs. A typical setup looks like this:
 
-1. Create a Crisp workspace and add a website.
-2. Copy the generated **Website ID** (a short alphanumeric string).
-3. Update the `data-chat-id` attribute on the `.live-chat-content` wrapper in `index.html` with that ID. The placeholder is currently empty so the button stays disabled until configured.
+1. Deploy a [Matrix homeserver](https://matrix.org/docs/projects/server/synapse/) (Synapse works well for small teams) on your infrastructure.
+2. Host the [Element web client](https://github.com/vector-im/element-web) on the same web server as this site (for example at `https://chat.3strands.co`).
+3. Create a dedicated support room (public or knock-only) and invite your team so they receive notifications through Element on desktop and mobile.
+4. Update the `.live-chat-content` wrapper in `index.html` with your Element embed URL:
 
-Once the ID is in place, the site will load the Crisp widget automatically and the "Launch Live Chat" button will open the chat drawer. Remove the `disabled` attribute only if you want the button active before Crisp loads.
+   ```html
+   <div
+       class="live-chat-content"
+       data-chat-provider="matrix"
+       data-matrix-embed-url="https://chat.3strands.co/#/room/#support:3strands.co?via=3strands.co"
+       data-matrix-room-name="3 Strands Support"
+   >
+   ```
+
+   The `data-matrix-room-name` attribute controls the accessible label and window title.
+
+With the embed URL in place, the "Launch Live Chat" button renders an on-site overlay that loads your self-hosted Element client. Guests can converse from the website, and your employees can respond (with alerts) via their Element apps. Leave the `data-matrix-embed-url` empty during staging to keep the button disabled while infrastructure is prepared.

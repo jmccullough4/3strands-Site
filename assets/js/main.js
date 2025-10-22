@@ -116,10 +116,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const liveChatContainer = document.querySelector('.live-chat-content[data-chat-provider="crisp"]');
+    const liveChatContainer = document.querySelector('.live-chat-content[data-chat-provider="matrix"]');
 
     if (liveChatContainer) {
-        const chatId = (liveChatContainer.getAttribute('data-chat-id') || '').trim();
+        const embedUrl = (liveChatContainer.getAttribute('data-matrix-embed-url') || '').trim();
+        const roomName = (liveChatContainer.getAttribute('data-matrix-room-name') || '3 Strands Cattle Co. Live Chat').trim();
         const chatButton = liveChatContainer.querySelector('[data-chat-toggle]');
         const chatStatus = liveChatContainer.querySelector('[data-chat-status]');
 
@@ -136,25 +137,77 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        if (chatId) {
-            window.$crisp = window.$crisp || [];
-            window.CRISP_WEBSITE_ID = chatId;
+        const openOverlay = () => {
+            const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+            const overlay = document.createElement('div');
+            overlay.classList.add('live-chat-overlay');
 
-            const script = document.createElement('script');
-            script.src = 'https://client.crisp.chat/l.js';
-            script.async = true;
-            document.head.appendChild(script);
+            const frame = document.createElement('div');
+            frame.classList.add('live-chat-frame');
+            frame.setAttribute('role', 'dialog');
+            frame.setAttribute('aria-modal', 'true');
 
-            if (chatButton) {
-                chatButton.disabled = false;
-                chatButton.addEventListener('click', () => {
-                    window.$crisp.push(['do', 'chat:open']);
-                });
+            if (roomName) {
+                frame.setAttribute('aria-label', roomName);
             }
 
-            setChatStatus('Live chat is online. Click below to start a conversation with our team.', 'is-live');
+            const closeButton = document.createElement('button');
+            closeButton.type = 'button';
+            closeButton.classList.add('live-chat-close');
+            closeButton.setAttribute('aria-label', 'Close live chat');
+            closeButton.textContent = '×';
+
+            const iframe = document.createElement('iframe');
+            iframe.src = embedUrl;
+            iframe.title = roomName || 'Live chat';
+            iframe.loading = 'lazy';
+            iframe.setAttribute('allow', 'microphone; camera; clipboard-read; clipboard-write');
+
+            const teardown = () => {
+                document.removeEventListener('keydown', handleKeydown);
+                overlay.remove();
+
+                if (previousFocus) {
+                    previousFocus.focus({ preventScroll: true });
+                }
+            };
+
+            const handleKeydown = (event) => {
+                if (event.key === 'Escape') {
+                    teardown();
+                }
+            };
+
+            closeButton.addEventListener('click', teardown);
+
+            overlay.addEventListener('click', (event) => {
+                if (event.target === overlay) {
+                    teardown();
+                }
+            });
+
+            document.addEventListener('keydown', handleKeydown);
+
+            frame.appendChild(closeButton);
+            frame.appendChild(iframe);
+            overlay.appendChild(frame);
+            document.body.appendChild(overlay);
+
+            requestAnimationFrame(() => {
+                overlay.classList.add('is-open');
+                closeButton.focus({ preventScroll: true });
+            });
+        };
+
+        if (embedUrl) {
+            if (chatButton) {
+                chatButton.disabled = false;
+                chatButton.addEventListener('click', openOverlay);
+            }
+
+            setChatStatus('Live chat is online. Launch the window to connect with our team instantly.', 'is-live');
         } else {
-            setChatStatus('Live chat is almost ready—add your Crisp website ID to enable the chat bubble.', null);
+            setChatStatus('Live chat is almost ready—host Element on your server and paste its embed URL into the data attribute.', null);
 
             if (chatButton) {
                 chatButton.disabled = true;
