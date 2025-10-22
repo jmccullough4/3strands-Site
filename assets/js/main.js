@@ -115,4 +115,50 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    const liveChatContainer = document.querySelector('.live-chat-content[data-chat-provider="crisp"]');
+
+    if (liveChatContainer) {
+        const chatId = (liveChatContainer.getAttribute('data-chat-id') || '').trim();
+        const chatButton = liveChatContainer.querySelector('[data-chat-toggle]');
+        const chatStatus = liveChatContainer.querySelector('[data-chat-status]');
+
+        const setChatStatus = (message, modifier) => {
+            if (!chatStatus) {
+                return;
+            }
+
+            chatStatus.textContent = message;
+            chatStatus.classList.remove('is-live');
+
+            if (modifier) {
+                chatStatus.classList.add(modifier);
+            }
+        };
+
+        if (chatId) {
+            window.$crisp = window.$crisp || [];
+            window.CRISP_WEBSITE_ID = chatId;
+
+            const script = document.createElement('script');
+            script.src = 'https://client.crisp.chat/l.js';
+            script.async = true;
+            document.head.appendChild(script);
+
+            if (chatButton) {
+                chatButton.disabled = false;
+                chatButton.addEventListener('click', () => {
+                    window.$crisp.push(['do', 'chat:open']);
+                });
+            }
+
+            setChatStatus('Live chat is online. Click below to start a conversation with our team.', 'is-live');
+        } else {
+            setChatStatus('Live chat is almost ready—add your Crisp website ID to enable the chat bubble.', null);
+
+            if (chatButton) {
+                chatButton.disabled = true;
+            }
+        }
+    }
 });
