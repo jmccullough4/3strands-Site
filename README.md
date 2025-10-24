@@ -1,6 +1,6 @@
 # 3 Strands Cattle Co. Website
 
-Static marketing website for 3 Strands Cattle Co. highlighting mission, premium livestock offerings, and contact options.
+Static marketing website for 3 Strands Cattle Co.—a Florida distribution company owned by two veteran families—highlighting mission, premium livestock offerings, and contact options.
 
 ## Local development
 
