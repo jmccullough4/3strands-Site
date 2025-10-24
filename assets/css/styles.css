@@ -32,6 +32,20 @@ body {
         radial-gradient(circle at 88% 22%, rgba(111, 58, 28, 0.2) 0%, transparent 48%),
         linear-gradient(165deg, rgba(246, 239, 227, 0.96) 0%, rgba(235, 219, 196, 0.9) 52%, rgba(247, 236, 221, 0.96) 100%);
     background-attachment: fixed;
+    position: relative;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: url('../img/logo.png');
+    background-repeat: no-repeat;
+    background-position: center 12rem;
+    background-size: min(38vw, 420px);
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: 0;
 }
 
 h1,
@@ -100,9 +114,10 @@ a:focus {
 .brand-link {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
+    gap: 0.85rem;
     border-radius: 1rem;
-    padding: 0.15rem;
+    padding: 0.15rem 0.5rem 0.15rem 0.15rem;
+    color: #f9f4ed;
 }
 
 .brand-logo {
@@ -112,6 +127,14 @@ a:focus {
     padding: 0.35rem;
     background: rgba(249, 244, 237, 0.12);
     box-shadow: 0 18px 30px rgba(10, 6, 4, 0.38);
+}
+
+.brand-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
 }
 
 .brand-link:focus-visible {
@@ -957,6 +980,10 @@ label {
         flex-direction: column;
         text-align: center;
     }
+
+    .brand-name {
+        font-size: 1rem;
+    }
 }
 
 @media (max-width: 600px) {
@@ -967,5 +994,12 @@ label {
 
     .hero-card {
         padding: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .brand-name {
+        white-space: normal;
+        line-height: 1.2;
     }
 }
