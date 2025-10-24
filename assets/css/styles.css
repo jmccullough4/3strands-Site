@@ -238,6 +238,7 @@ a:focus {
     position: relative;
     color: rgba(249, 244, 237, 0.88);
     padding-bottom: 0.25rem;
+    text-decoration: none;
 }
 
 .primary-nav a::after {
@@ -257,6 +258,11 @@ a:focus {
 .primary-nav a:focus::after {
     transform: scaleX(1);
     transform-origin: left;
+}
+
+.primary-nav a:focus-visible {
+    outline: 2px solid rgba(249, 244, 237, 0.75);
+    outline-offset: 4px;
 }
 
 .cta-button,
