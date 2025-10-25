@@ -6,8 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const header = document.querySelector('.site-header');
     const observerTarget = document.querySelector('.hero');
-    const missionSection = document.getElementById('mission');
-
     if (observerTarget) {
         document.body.classList.add('hero-visible');
     }
@@ -18,24 +16,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             header.classList.toggle('scrolled', !isIntersecting);
             document.body.classList.toggle('hero-visible', isIntersecting);
-
-            if (isIntersecting) {
-                document.body.classList.remove('show-watermark');
-            }
         }, { threshold: 0.1 });
 
         observer.observe(observerTarget);
-    }
-
-    if (missionSection && 'IntersectionObserver' in window) {
-        const missionObserver = new IntersectionObserver(([entry]) => {
-            const { isIntersecting, boundingClientRect } = entry;
-            const missionHasPassed = isIntersecting || boundingClientRect.top < 0;
-
-            document.body.classList.toggle('show-watermark', missionHasPassed);
-        }, { threshold: 0.15 });
-
-        missionObserver.observe(missionSection);
     }
 
     const navToggle = document.querySelector('.nav-toggle');
