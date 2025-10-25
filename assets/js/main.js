@@ -7,13 +7,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const header = document.querySelector('.site-header');
     const observerTarget = document.querySelector('.hero');
 
+    if (observerTarget) {
+        document.body.classList.add('hero-visible');
+    }
+
     if (header && observerTarget && 'IntersectionObserver' in window) {
         const observer = new IntersectionObserver(([entry]) => {
-            if (!entry.isIntersecting) {
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
-            }
+            const isIntersecting = entry.isIntersecting;
+
+            header.classList.toggle('scrolled', !isIntersecting);
+            document.body.classList.toggle('hero-visible', isIntersecting);
         }, { threshold: 0.1 });
 
         observer.observe(observerTarget);

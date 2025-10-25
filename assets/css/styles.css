@@ -46,6 +46,11 @@ body::before {
     opacity: 0.05;
     pointer-events: none;
     z-index: 0;
+    transition: opacity 320ms ease;
+}
+
+body.hero-visible::before {
+    opacity: 0;
 }
 
 h1,
@@ -314,7 +319,7 @@ main {
     background: radial-gradient(circle at 8% 12%, rgba(216, 160, 79, 0.55) 0%, rgba(216, 160, 79, 0) 52%),
         linear-gradient(130deg, rgba(47, 27, 17, 0.95) 0%, rgba(111, 58, 28, 0.85) 55%, rgba(216, 160, 79, 0.58) 100%);
     clip-path: ellipse(120% 100% at 18% 0%);
-    z-index: -2;
+    z-index: -3;
 }
 
 .hero::after {
@@ -326,6 +331,22 @@ main {
     mix-blend-mode: screen;
     opacity: 0.38;
     z-index: -1;
+}
+
+.hero-watermark {
+    position: absolute;
+    top: -18%;
+    left: -14%;
+    width: min(70vw, 560px);
+    aspect-ratio: 1;
+    background-image: url('../img/logo.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    opacity: 0.08;
+    filter: saturate(0.9);
+    transform: rotate(-5deg);
+    pointer-events: none;
+    z-index: -2;
 }
 
 .hero-content {
@@ -975,6 +996,14 @@ label {
 
     .hero {
         padding-top: 5.5rem;
+    }
+
+    .hero-watermark {
+        top: -32%;
+        left: -48%;
+        width: 120vw;
+        opacity: 0.075;
+        transform: rotate(-2deg);
     }
 
     .footer-branding {
