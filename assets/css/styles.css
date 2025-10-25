@@ -41,18 +41,23 @@ body::before {
     inset: 0;
     background-image: url('../img/logo.png');
     background-repeat: no-repeat;
-    background-position: right 6% top 8rem;
-    background-size: min(36vw, 400px);
-    opacity: 0.05;
+    background-position: center 45%;
+    background-size: min(52vw, 460px);
+    opacity: 0;
     pointer-events: none;
     z-index: 0;
+    transform: translate3d(0, 0, 0) scale(0.94);
     transition: opacity 320ms ease, transform 320ms ease;
-    transform: translate3d(0, 0, 0);
+}
+
+body.show-watermark::before {
+    opacity: 0.055;
+    transform: translate3d(0, 0, 0) scale(1);
 }
 
 body.hero-visible::before {
-    opacity: 0.018;
-    transform: translate3d(3%, -2%, 0);
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.94);
 }
 
 h1,
@@ -337,18 +342,27 @@ main {
 
 .hero-watermark {
     position: absolute;
-    top: -20%;
-    right: -18%;
-    width: min(70vw, 540px);
+    top: 40%;
+    left: 50%;
+    width: min(82vw, 520px);
     aspect-ratio: 1;
     background-image: url('../img/logo.png');
     background-repeat: no-repeat;
     background-size: contain;
-    opacity: 0.09;
+    opacity: 0;
     filter: saturate(0.9);
-    transform: rotate(6deg);
+    transform: translate(-50%, -50%) rotate(4deg);
     pointer-events: none;
     z-index: -2;
+    transition: opacity 320ms ease;
+}
+
+body.show-watermark .hero-watermark {
+    opacity: 0.085;
+}
+
+body.hero-visible .hero-watermark {
+    opacity: 0;
 }
 
 .hero-content {
