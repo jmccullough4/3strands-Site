@@ -322,10 +322,9 @@ main {
     position: absolute;
     inset: 0;
     background-image: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.08) 0, transparent 55%),
-        radial-gradient(circle at 80% 30%, rgba(255, 255, 255, 0.06) 0, transparent 55%),
-        repeating-linear-gradient(140deg, rgba(249, 244, 237, 0.05), rgba(249, 244, 237, 0.05) 12px, transparent 12px, transparent 28px);
+        radial-gradient(circle at 80% 30%, rgba(255, 255, 255, 0.06) 0, transparent 55%);
     mix-blend-mode: screen;
-    opacity: 0.45;
+    opacity: 0.38;
     z-index: -1;
 }
 
