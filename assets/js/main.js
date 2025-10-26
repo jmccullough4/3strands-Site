@@ -88,13 +88,23 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const formData = new FormData(contactForm);
-            const replyToEmail = formData.get('email') || '';
-            if (replyToEmail) {
+            const replyToEmail = formData.get('email');
+
+            if (replyToEmail && !formData.get('_replyto')) {
                 formData.set('_replyto', replyToEmail);
             }
 
+            const dataEndpoint = contactForm.getAttribute('data-formsubmit-endpoint');
+            let submitUrl = dataEndpoint && dataEndpoint.trim();
+
+            if (!submitUrl) {
+                submitUrl = contactForm.action.includes('/ajax/')
+                    ? contactForm.action
+                    : contactForm.action.replace('https://formsubmit.co/', 'https://formsubmit.co/ajax/');
+            }
+
             try {
-                const response = await fetch(contactForm.action, {
+                const response = await fetch(submitUrl, {
                     method: 'POST',
                     headers: {
                         Accept: 'application/json',
@@ -102,18 +112,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: formData,
                 });
 
-                const payload = await response.json().catch(() => ({}));
+                const responseBody = await response.json().catch(() => ({}));
 
                 if (!response.ok) {
-                    throw new Error(payload.message || `Request failed with status ${response.status}`);
+                    throw new Error(responseBody.message || `Request failed with status ${response.status}`);
                 }
 
-                if (Object.prototype.hasOwnProperty.call(payload, 'success')) {
-                    const successValue = payload.success;
+                if (Object.prototype.hasOwnProperty.call(responseBody, 'success')) {
+                    const successValue = responseBody.success;
                     const isSuccessful = successValue === true || successValue === 'true';
 
                     if (!isSuccessful) {
-                        throw new Error(payload.message || 'Form submission was rejected by the email service.');
+                        throw new Error(responseBody.message || 'Form submission was rejected by the email service.');
                     }
                 }
 
