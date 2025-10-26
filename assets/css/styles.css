@@ -772,6 +772,8 @@ main {
     border-radius: 1.4rem;
     box-shadow: var(--shadow-soft);
     border: 1px solid rgba(49, 31, 23, 0.1);
+    position: relative;
+    z-index: 1;
 }
 
 .service-area-list li {
@@ -796,6 +798,18 @@ main {
     align-items: start;
 }
 
+.contact-info-card {
+    background-color: #ffffff;
+    padding: 2.25rem;
+    border-radius: 1.4rem;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid rgba(49, 31, 23, 0.12);
+    display: grid;
+    gap: 1.25rem;
+    position: relative;
+    z-index: 1;
+}
+
 .contact h2 {
     font-size: 2.1rem;
 }
@@ -813,6 +827,8 @@ main {
     border: 1px solid rgba(49, 31, 23, 0.12);
     display: grid;
     gap: 1.25rem;
+    position: relative;
+    z-index: 1;
 }
 
 .form-group {
@@ -892,19 +908,23 @@ label {
 }
 
 .footer-logo {
-    width: 3rem;
-    height: 3rem;
+    width: 3.9rem;
+    height: 3.9rem;
 }
 
 .footer-links {
     display: flex;
     gap: 1.5rem;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    justify-content: center;
+    overflow-x: auto;
 }
 
 .footer-links a {
     color: #443100;
     font-weight: 600;
+    flex: 0 0 auto;
+    white-space: nowrap;
 }
 
 .footer-links a:hover,
