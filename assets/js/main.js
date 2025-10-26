@@ -73,6 +73,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
+        const buildPayload = (formData) => {
+            const payload = {};
+
+            for (const [key, value] of formData.entries()) {
+                payload[key] = value;
+            }
+
+            return payload;
+        };
+
         contactForm.addEventListener('submit', async (event) => {
             event.preventDefault();
 
@@ -88,15 +98,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const formData = new FormData(contactForm);
-            formData.append('_replyto', formData.get('email') || '');
+            const replyToEmail = formData.get('email') || '';
+            const submissionPayload = buildPayload(formData);
+
+            if (replyToEmail) {
+                submissionPayload._replyto = replyToEmail;
+            }
 
             try {
                 const response = await fetch(contactForm.action, {
                     method: 'POST',
                     headers: {
                         Accept: 'application/json',
+                        'Content-Type': 'application/json',
                     },
-                    body: formData,
+                    body: JSON.stringify(submissionPayload),
                 });
 
                 const payload = await response.json().catch(() => ({}));

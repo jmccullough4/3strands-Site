@@ -896,14 +896,18 @@ label {
 .footer-content {
     display: flex;
     align-items: center;
-    justify-content: center;
-    text-align: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: nowrap;
 }
 
 .footer-branding {
     display: flex;
     align-items: center;
     gap: 1rem;
+    text-align: left;
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 .footer-logo {
@@ -917,12 +921,19 @@ label {
     text-transform: uppercase;
 }
 
-@media (min-width: 900px) {
-    .footer-content {
-        flex-direction: row;
-        justify-content: center;
-        text-align: center;
-    }
+.footer-flag {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 14px 22px rgba(42, 26, 20, 0.18));
+    flex: 0 0 auto;
+}
+
+.footer-flag-graphic {
+    width: clamp(96px, 18vw, 160px);
+    height: auto;
+    border-radius: 0.65rem;
+    overflow: hidden;
 }
 
 @media (min-width: 769px) {
