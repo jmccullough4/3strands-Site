@@ -18,7 +18,7 @@ The production deployment should include `assets/img/logo.png`, which contains t
 
 ## Contact form delivery
 
-The "Contact Us" form posts a JSON payload to [FormSubmit](https://formsubmit.co)'s AJAX endpoint so visitors can stay on the page while a confirmation message appears. Each request is sent to `https://formsubmit.co/ajax/info@3strands.co`, and FormSubmit relays the details to `info@3strands.co`.
+The "Contact Us" form submits `FormData` to [FormSubmit](https://formsubmit.co)'s AJAX endpoint so visitors can stay on the page while a confirmation message appears. Each request is sent to `https://formsubmit.co/ajax/info@3strands.co`, and FormSubmit relays the details to `info@3strands.co`.
 
 - The first submission from a new deployment will trigger a verification email from FormSubmit—approve it once to activate delivery.
 - The delivered message includes a "3 Strands Cattle Co. Website Inquiry" header along with the submitted fields so the team can quickly recognize website leads.

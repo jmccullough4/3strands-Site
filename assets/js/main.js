@@ -73,26 +73,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        const formDataToJson = (formData) => {
-            const jsonPayload = {};
-
-            formData.forEach((value, key) => {
-                if (Object.prototype.hasOwnProperty.call(jsonPayload, key)) {
-                    const existingValue = jsonPayload[key];
-
-                    if (Array.isArray(existingValue)) {
-                        existingValue.push(value);
-                    } else {
-                        jsonPayload[key] = [existingValue, value];
-                    }
-                } else {
-                    jsonPayload[key] = value;
-                }
-            });
-
-            return jsonPayload;
-        };
-
         contactForm.addEventListener('submit', async (event) => {
             event.preventDefault();
 
@@ -114,7 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 formData.set('_replyto', replyToEmail);
             }
 
-            const jsonBody = formDataToJson(formData);
             const dataEndpoint = contactForm.getAttribute('data-formsubmit-endpoint');
             let submitUrl = dataEndpoint && dataEndpoint.trim();
 
@@ -128,9 +107,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
-                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(jsonBody),
+                body: formData,
             };
 
             let timeoutId;
