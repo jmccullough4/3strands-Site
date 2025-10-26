@@ -895,9 +895,8 @@ label {
 
 .footer-content {
     display: flex;
-    flex-direction: column;
-    gap: 1.6rem;
     align-items: center;
+    justify-content: center;
     text-align: center;
 }
 
@@ -912,26 +911,6 @@ label {
     height: 3.9rem;
 }
 
-.footer-links {
-    display: flex;
-    gap: 1.5rem;
-    flex-wrap: nowrap;
-    justify-content: center;
-    overflow-x: auto;
-}
-
-.footer-links a {
-    color: #443100;
-    font-weight: 600;
-    flex: 0 0 auto;
-    white-space: nowrap;
-}
-
-.footer-links a:hover,
-.footer-links a:focus {
-    color: var(--brand-leather);
-}
-
 .footer-brand {
     font-weight: 600;
     letter-spacing: 0.05em;
@@ -941,8 +920,8 @@ label {
 @media (min-width: 900px) {
     .footer-content {
         flex-direction: row;
-        justify-content: space-between;
-        text-align: left;
+        justify-content: center;
+        text-align: center;
     }
 }
 
