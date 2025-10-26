@@ -66,11 +66,31 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             statusEl.textContent = message;
-            statusEl.classList.remove('is-success', 'is-error');
+            statusEl.classList.remove('is-success', 'is-error', 'is-pending');
 
             if (type) {
                 statusEl.classList.add(type);
             }
+        };
+
+        const formDataToJson = (formData) => {
+            const jsonPayload = {};
+
+            formData.forEach((value, key) => {
+                if (Object.prototype.hasOwnProperty.call(jsonPayload, key)) {
+                    const existingValue = jsonPayload[key];
+
+                    if (Array.isArray(existingValue)) {
+                        existingValue.push(value);
+                    } else {
+                        jsonPayload[key] = [existingValue, value];
+                    }
+                } else {
+                    jsonPayload[key] = value;
+                }
+            });
+
+            return jsonPayload;
         };
 
         contactForm.addEventListener('submit', async (event) => {
@@ -81,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            setStatus('Sending your message…', null);
+            setStatus('Sending your message…', 'is-pending');
 
             if (submitButton) {
                 submitButton.disabled = true;
@@ -94,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 formData.set('_replyto', replyToEmail);
             }
 
+            const jsonBody = formDataToJson(formData);
             const dataEndpoint = contactForm.getAttribute('data-formsubmit-endpoint');
             let submitUrl = dataEndpoint && dataEndpoint.trim();
 
@@ -103,14 +124,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     : contactForm.action.replace('https://formsubmit.co/', 'https://formsubmit.co/ajax/');
             }
 
+            const fetchOptions = {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(jsonBody),
+            };
+
+            let timeoutId;
+            let abortController;
+
+            if (typeof AbortController !== 'undefined') {
+                abortController = new AbortController();
+                timeoutId = window.setTimeout(() => {
+                    abortController.abort();
+                }, 15000);
+                fetchOptions.signal = abortController.signal;
+            }
+
             try {
-                const response = await fetch(submitUrl, {
-                    method: 'POST',
-                    headers: {
-                        Accept: 'application/json',
-                    },
-                    body: formData,
-                });
+                const response = await fetch(submitUrl, fetchOptions);
 
                 const responseBody = await response.json().catch(() => ({}));
 
@@ -131,8 +166,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 setStatus('Thank you! Your message has been sent. We will be in touch soon.', 'is-success');
             } catch (error) {
                 console.error('Contact form submission failed:', error);
-                setStatus('We could not send your message. Please try again or email info@3strands.co or call us at (561) 917-9047.', 'is-error');
+                if (error.name === 'AbortError') {
+                    setStatus('The email service took too long to respond. Please try again or email info@3strands.co or call us at (561) 917-9047.', 'is-error');
+                } else {
+                    setStatus('We could not send your message. Please try again or email info@3strands.co or call us at (561) 917-9047.', 'is-error');
+                }
             } finally {
+                if (timeoutId) {
+                    window.clearTimeout(timeoutId);
+                }
                 if (submitButton) {
                     submitButton.disabled = false;
                 }

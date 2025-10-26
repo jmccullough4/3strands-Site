@@ -878,6 +878,10 @@ label {
     margin: -0.2rem 0 0;
 }
 
+.form-status.is-pending {
+    color: var(--text-muted);
+}
+
 .form-status.is-success {
     color: #2f6f3c;
 }

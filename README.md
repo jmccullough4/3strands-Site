@@ -18,13 +18,13 @@ The production deployment should include `assets/img/logo.png`, which contains t
 
 ## Contact form delivery
 
-The "Contact Us" form sends submissions to [FormSubmit](https://formsubmit.co) using their AJAX endpoint so visitors can stay on the page while a confirmation message appears. Each request is posted to `https://formsubmit.co/ajax/info@3strands.co` and FormSubmit relays the details to `info@3strands.co`.
+The "Contact Us" form posts a JSON payload to [FormSubmit](https://formsubmit.co)'s AJAX endpoint so visitors can stay on the page while a confirmation message appears. Each request is sent to `https://formsubmit.co/ajax/info@3strands.co`, and FormSubmit relays the details to `info@3strands.co`.
 
 - The first submission from a new deployment will trigger a verification email from FormSubmit—approve it once to activate delivery.
 - The delivered message includes a "3 Strands Cattle Co. Website Inquiry" header along with the submitted fields so the team can quickly recognize website leads.
-- If FormSubmit ever rejects the AJAX call (for example, if the verification email isn't confirmed), the inline error message guides visitors to email or call directly.
+- If FormSubmit ever rejects or times out on the AJAX call (for example, if the verification email isn't confirmed or the service is unreachable), the inline error message guides visitors to email or call directly.
 
-Consider adding FormSubmit's confirmation address to your allowlist to ensure reliable notifications.
+Consider adding FormSubmit's confirmation address to your allowlist to ensure reliable notifications. The frontend also aborts stalled requests after 15 seconds to prevent the status from staying on "Sending your message…" if the FormSubmit endpoint does not respond.
 
 ## Live chat
 
