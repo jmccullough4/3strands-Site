@@ -40,6 +40,23 @@
         }
     }
 
+    // Customize widget appearance - cleaner, more modern look
+    Tawk_API.customStyle = {
+        visibility: {
+            desktop: {
+                position: 'br',
+                xOffset: 20,
+                yOffset: 20
+            },
+            mobile: {
+                position: 'br',
+                xOffset: 10,
+                yOffset: 10
+            }
+        },
+        zIndex: 1000
+    };
+
     Tawk_API.onLoad = function() {
         if (!isWithinBusinessHours()) {
             Tawk_API.setAttributes({
@@ -58,6 +75,20 @@
     })();
     </script>
     <!-- End Tawk.to -->
+
+    <!-- Tawk.to Custom Styling - Hide branding and reduce animations -->
+    <style>
+        /* Reduce bouncy animations on the widget */
+        #tawk-bubble-container,
+        .tawk-min-container,
+        [id^="tawk-"] {
+            animation-duration: 0.15s !important;
+            transition-duration: 0.15s !important;
+        }
+        /* Disable bounce/pulse animations */
+        @keyframes tawk-bounce { 0%, 100% { transform: scale(1); } }
+        @keyframes tawk-pulse { 0%, 100% { opacity: 1; } }
+    </style>
 
     <header class="site-header">
         <div class="container header-content">
