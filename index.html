@@ -17,11 +17,8 @@
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body id="top">
-    <!-- Tawk.to Live Chat - Configured for business hours -->
+    <!-- Tawk.to Live Chat - Business hours: M-Sat 7am-9pm, Sun 12-4pm ET -->
     <script type="text/javascript">
-    // Tawk.to Configuration
-    // REPLACE 'YOUR_PROPERTY_ID' and 'YOUR_WIDGET_ID' with your actual Tawk.to IDs
-    // Get these from: https://dashboard.tawk.to/ after creating your account
     var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
 
     // Check if within business hours (Eastern Time)
@@ -38,10 +35,9 @@
         // M-Sat: 7am-9pm (420-1260 minutes), Sun: 12pm-4pm (720-960 minutes)
         if (day === 'Sun') {
             return currentMinutes >= 720 && currentMinutes < 960;
-        } else if (day !== 'Sun') {
+        } else {
             return currentMinutes >= 420 && currentMinutes < 1260;
         }
-        return false;
     }
 
     Tawk_API.onLoad = function() {
@@ -55,7 +51,7 @@
     (function(){
     var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
     s1.async=true;
-    s1.src='https://embed.tawk.to/YOUR_PROPERTY_ID/YOUR_WIDGET_ID';
+    s1.src='https://embed.tawk.to/6969079b54ac551981db7d52/1jf14be9f';
     s1.charset='UTF-8';
     s1.setAttribute('crossorigin','*');
     s0.parentNode.insertBefore(s1,s0);
