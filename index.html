@@ -3,357 +3,735 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3 Strands Cattle Co. | Florida Prime Beef &amp; Pork Distribution</title>
-    <meta name="description" content="3 Strands Cattle Co. sources Prime beef and pork from Florida ranchers and butchers for markets, ministries, and restaurants across the state. Chicken available seasonally.">
+    <title>3 Strands Cattle Co. | Premium Florida Beef</title>
+    <meta name="description" content="3 Strands Cattle Co. delivers premium, Florida-sourced beef directly to your door. Veteran-owned, faith-driven. Bundle deals, subscriptions, and a la carte options available.">
     <link rel="icon" type="image/png" href="assets/img/logo.png">
     <link rel="apple-touch-icon" href="assets/img/logo.png">
     <meta property="og:image" content="assets/img/logo.png">
     <meta property="og:image:alt" content="3 Strands Cattle Co. logo">
+    <meta property="og:title" content="3 Strands Cattle Co. | Premium Florida Beef">
+    <meta property="og:description" content="Premium, Florida-sourced beef delivered to your door. Veteran-owned, faith-driven.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
-<body id="top" class="hero-visible">
+<body id="top">
+    <!-- Tawk.to Live Chat - Configured for business hours -->
+    <script type="text/javascript">
+    // Tawk.to Configuration
+    // REPLACE 'YOUR_PROPERTY_ID' and 'YOUR_WIDGET_ID' with your actual Tawk.to IDs
+    // Get these from: https://dashboard.tawk.to/ after creating your account
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+
+    // Check if within business hours (Eastern Time)
+    function isWithinBusinessHours() {
+        const now = new Date();
+        const etOptions = { timeZone: 'America/New_York', hour: 'numeric', minute: 'numeric', hour12: false };
+        const etTime = new Intl.DateTimeFormat('en-US', etOptions).format(now);
+        const [hours, minutes] = etTime.split(':').map(Number);
+        const currentMinutes = hours * 60 + minutes;
+
+        const dayOptions = { timeZone: 'America/New_York', weekday: 'short' };
+        const day = new Intl.DateTimeFormat('en-US', dayOptions).format(now);
+
+        // M-Sat: 7am-9pm (420-1260 minutes), Sun: 12pm-4pm (720-960 minutes)
+        if (day === 'Sun') {
+            return currentMinutes >= 720 && currentMinutes < 960;
+        } else if (day !== 'Sun') {
+            return currentMinutes >= 420 && currentMinutes < 1260;
+        }
+        return false;
+    }
+
+    Tawk_API.onLoad = function() {
+        if (!isWithinBusinessHours()) {
+            Tawk_API.setAttributes({
+                'status': 'offline'
+            });
+        }
+    };
+
+    (function(){
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true;
+    s1.src='https://embed.tawk.to/YOUR_PROPERTY_ID/YOUR_WIDGET_ID';
+    s1.charset='UTF-8';
+    s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
+    })();
+    </script>
+    <!-- End Tawk.to -->
+
     <header class="site-header">
         <div class="container header-content">
-            <div class="branding">
-                <a class="brand-link" href="#top">
-                    <img src="assets/img/logo.png" alt="3 Strands Cattle Co. logo" class="brand-logo" width="62" height="62">
-                    <span class="brand-name">3 Strands Cattle Co.</span>
-                </a>
-            </div>
+            <a class="brand-link" href="#top">
+                <img src="assets/img/logo.png" alt="3 Strands Cattle Co." class="brand-logo" width="56" height="56">
+                <span class="brand-name">3 Strands Cattle Co.</span>
+            </a>
             <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation">
-                <span class="nav-toggle-label">Menu</span>
+                <span class="sr-only">Menu</span>
                 <span class="nav-toggle-icon" aria-hidden="true"></span>
             </button>
             <nav class="primary-nav" id="primary-navigation" aria-label="Main navigation">
                 <ul>
-                    <li><a href="#mission">Mission</a></li>
-                    <li><a href="#offerings">Offerings</a></li>
-                    <li><a href="#network">Network</a></li>
-                    <li><a href="#values">Values</a></li>
-                    <li><a href="#collaboration">Partnerships</a></li>
+                    <li><a href="#products">Products</a></li>
+                    <li><a href="#bundles">Bundles</a></li>
+                    <li><a href="#subscriptions">Subscriptions</a></li>
+                    <li><a href="#about">About</a></li>
                     <li><a href="#contact">Contact</a></li>
+                    <li><a href="#order" class="nav-cta">Order Now</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
     <main>
+        <!-- Hero Section -->
         <section class="hero" aria-labelledby="hero-title">
             <div class="container hero-content">
-                <div>
-                    <p class="eyebrow">Florida Sourced • Prime Beef &amp; Pork Distribution</p>
-                    <h1 id="hero-title">Prime Florida Meats, Honest From Start to Finish</h1>
-                    <p class="hero-copy">We’re a veteran-owned Florida distributor sourcing premium beef and pork through trusted rancher–butcher partnerships, resupplying markets, ministries, and chefs across the state. Fresh chicken joins the lineup seasonally.</p>
+                <div class="hero-text">
+                    <span class="badge">Veteran Owned & Faith Driven</span>
+                    <h1 id="hero-title">Premium Florida Beef,<br>Delivered to Your Door</h1>
+                    <p class="hero-description">From our trusted Florida ranchers directly to your table. Prime and Choice cuts, custom bundles, and subscription options for families who demand the best.</p>
                     <div class="hero-actions">
-                        <a class="cta-button" href="#offerings">Explore Offerings</a>
-                        <a class="ghost-button" href="#mission">Our Mission</a>
+                        <a href="#products" class="btn btn-primary">Shop Beef</a>
+                        <a href="#bundles" class="btn btn-secondary">View Bundles</a>
                     </div>
-                    <p class="veteran-note"><span class="flag-icon" role="img" aria-label="United States flag">🇺🇸</span> Veteran family owned by two Florida families</p>
+                    <div class="hero-trust">
+                        <div class="trust-item">
+                            <svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            <span>100% Florida Sourced</span>
+                        </div>
+                        <div class="trust-item">
+                            <svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            <span>USDA Inspected</span>
+                        </div>
+                        <div class="trust-item">
+                            <svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                            <span>Free Delivery 50lb+</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="hero-card" role="img" aria-label="Illustration of a Florida cattle ranch at sunset with fencing and wide skies">
-                    <p class="card-title">Florida Supply Network</p>
-                    <p class="card-copy">Hands-on sourcing, ranch-to-rail oversight, and prayerful stewardship keep every box of Prime beef and pork market-ready the moment it reaches your case.</p>
+                <div class="hero-image">
+                    <div class="hero-card">
+                        <div class="hero-card-badge">Now Available</div>
+                        <h3>Premium Beef Bundles</h3>
+                        <p>Curated selections starting at $199</p>
+                        <a href="#bundles" class="btn btn-outline">Explore Bundles</a>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <section id="mission" class="mission" aria-labelledby="mission-title">
+        <!-- Chat Banner -->
+        <section class="chat-banner">
             <div class="container">
-                <h2 id="mission-title">Mission Statement</h2>
-                <p class="mission-copy">At 3 Strands Cattle Co., we are united in faith and purpose to glorify Jesus Christ through honest business practices, faithful stewardship of resources, and devoted service to others. Guided by Biblical principles of integrity, humility, and love for neighbor, we operate in a manner that honors God, supports local farmers, and provides quality beef, pork, and chicken to our community — always putting people over profit.</p>
-            </div>
-        </section>
-
-        <section id="heritage" class="heritage" aria-labelledby="heritage-title">
-            <div class="container heritage-grid">
-                <div>
-                    <p class="eyebrow">Built by Florida Veteran Families</p>
-                    <h2 id="heritage-title">Florida Heritage. Veteran Strength.</h2>
-                    <p class="heritage-copy">3 Strands Cattle Co. is owned and operated by two veteran families, blending years of military discipline with the grit of Florida cattle country. We steward every relationship with the same integrity that guided us in uniform—serving local ranchers, ministries, and markets with steady hands and Christ-centered purpose.</p>
+                <div class="chat-banner-content">
+                    <div class="chat-info">
+                        <svg class="chat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        <div>
+                            <strong>Chat With Us</strong>
+                            <span class="chat-hours">Mon-Sat 7am-9pm | Sun 12pm-4pm ET</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-chat" onclick="if(typeof Tawk_API !== 'undefined') Tawk_API.maximize();">Start Chat</button>
                 </div>
-                <ul class="heritage-list">
-                    <li><strong>Discipline &amp; Dependability:</strong> Logistics minded scheduling keeps your cases stocked when you need them.</li>
-                    <li><strong>Florida Heritage:</strong> Multi-generation ranch partners across the state deliver Prime beef and pork you can stand behind.</li>
-                    <li><strong>Service-Ready Support:</strong> Direct access to our veteran family teams for rush orders, ministry outreaches, and market weekends.</li>
-                </ul>
             </div>
         </section>
 
-        <section id="offerings" class="offerings" aria-labelledby="offerings-title">
+        <!-- Products Section - A La Carte -->
+        <section id="products" class="products" aria-labelledby="products-title">
             <div class="container">
-                <h2 id="offerings-title">Prime Programs for Florida Buyers</h2>
-                <p class="section-lede">Purpose-built cases and bulk programs for markets, ministries, and chefs who want honest, Prime cuts sourced from Florida partners.</p>
-                <div class="offering-grid">
-                    <article class="offering-card">
-                        <h3>Prime Beef</h3>
-                        <p>Florida-finished Angus and Brangus beef, graded Prime and portioned for retail and foodservice programs that demand consistent marbling.</p>
-                        <ul>
-                            <li>Retail-ready steaks, roasts, ground, and value-added items</li>
-                            <li>Cut sheets for markets, ministries, and seasonal events</li>
-                            <li>Cold-chain delivery statewide with inventory tracking</li>
+                <div class="section-header">
+                    <span class="section-label">A La Carte</span>
+                    <h2 id="products-title">Premium Beef Cuts</h2>
+                    <p class="section-description">Hand-selected Prime and Choice cuts from Florida's finest ranches. Perfect for those who know exactly what they want.</p>
+                </div>
+
+                <div class="product-categories">
+                    <div class="category-card">
+                        <div class="category-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                        </div>
+                        <h3>Steaks</h3>
+                        <ul class="price-list">
+                            <li><span>Ribeye (Bone-In)</span><span class="price">$28/lb</span></li>
+                            <li><span>NY Strip</span><span class="price">$26/lb</span></li>
+                            <li><span>Filet Mignon</span><span class="price">$38/lb</span></li>
+                            <li><span>T-Bone</span><span class="price">$24/lb</span></li>
+                            <li><span>Sirloin</span><span class="price">$18/lb</span></li>
+                            <li><span>Flank Steak</span><span class="price">$16/lb</span></li>
                         </ul>
-                    </article>
-                    <article class="offering-card">
-                        <h3>Prime Pork</h3>
-                        <p>Hand-selected Duroc and Berkshire pork from trusted Florida processors, trimmed for display cases and large-format ministry meals.</p>
-                        <ul>
-                            <li>Chops, shoulders, ribs, and sausages packed for quick turnover</li>
-                            <li>Event-friendly whole hog and roasting primals</li>
-                            <li>Private label opportunities for markets and ministries</li>
+                    </div>
+
+                    <div class="category-card">
+                        <div class="category-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                        </div>
+                        <h3>Roasts</h3>
+                        <ul class="price-list">
+                            <li><span>Prime Rib Roast</span><span class="price">$22/lb</span></li>
+                            <li><span>Chuck Roast</span><span class="price">$12/lb</span></li>
+                            <li><span>Brisket (Whole)</span><span class="price">$14/lb</span></li>
+                            <li><span>Tri-Tip</span><span class="price">$16/lb</span></li>
+                            <li><span>Rump Roast</span><span class="price">$11/lb</span></li>
                         </ul>
-                    </article>
-                    <article class="offering-card">
-                        <h3>Seasonal Chicken</h3>
-                        <p>Chicken is offered when our growers have fresh harvests available—always sourced from Florida farms that align with our stewardship standards.</p>
-                        <ul>
-                            <li>Whole birds, tenders, and wings in limited releases</li>
-                            <li>Advance order lists to reserve incoming supply</li>
-                            <li>Substitution planning when poultry volume is constrained</li>
+                    </div>
+
+                    <div class="category-card">
+                        <div class="category-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                        </div>
+                        <h3>Ground & More</h3>
+                        <ul class="price-list">
+                            <li><span>Ground Beef (80/20)</span><span class="price">$9/lb</span></li>
+                            <li><span>Ground Beef (90/10)</span><span class="price">$11/lb</span></li>
+                            <li><span>Stew Meat</span><span class="price">$12/lb</span></li>
+                            <li><span>Short Ribs</span><span class="price">$15/lb</span></li>
+                            <li><span>Beef Shanks</span><span class="price">$10/lb</span></li>
+                            <li><span>Oxtail</span><span class="price">$14/lb</span></li>
                         </ul>
-                    </article>
+                    </div>
+
+                    <div class="category-card">
+                        <div class="category-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                        </div>
+                        <h3>Specialty</h3>
+                        <ul class="price-list">
+                            <li><span>Beef Liver</span><span class="price">$6/lb</span></li>
+                            <li><span>Beef Heart</span><span class="price">$7/lb</span></li>
+                            <li><span>Beef Tongue</span><span class="price">$12/lb</span></li>
+                            <li><span>Marrow Bones</span><span class="price">$5/lb</span></li>
+                            <li><span>Soup Bones</span><span class="price">$4/lb</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="products-cta">
+                    <p>Prices are per pound. Minimum order: 10 lbs for a la carte items.</p>
+                    <a href="#order" class="btn btn-primary">Place A La Carte Order</a>
                 </div>
             </div>
         </section>
 
-        <section id="network" class="network" aria-labelledby="network-title">
-            <div class="container network-grid">
-                <div>
-                    <p class="eyebrow">Florida Relationships First</p>
-                    <h2 id="network-title">Sourcing Directly from Florida Ranchers &amp; Butchers</h2>
-                    <p class="network-copy">3 Strands Cattle Co. works alongside multi-generation ranch families and boutique processors from the Panhandle to South Florida. Every delivery comes with the provenance, stewardship practices, and USDA grades your customers expect, so you can resell with confidence at Florida markets and ministries—backed by the accountability of our two veteran families.</p>
-                </div>
-                <ul class="network-highlights">
-                    <li><strong>Traceable Supply:</strong> Documentation on ranch of origin, processor, and Prime grading accompanies every order.</li>
-                    <li><strong>Market Support:</strong> Merchandising notes, pricing insights, and ministry menu planning to help your team move product faithfully.</li>
-                    <li><strong>Cold-Chain Logistics:</strong> Dedicated Florida routes keep proteins chilled from pickup to your prep table.</li>
-                </ul>
-            </div>
-        </section>
-
-        <section id="values" class="values" aria-labelledby="values-title">
+        <!-- Bundles Section -->
+        <section id="bundles" class="bundles" aria-labelledby="bundles-title">
             <div class="container">
-                <div class="values-header">
-                    <h2 id="values-title">Faithful Practices</h2>
-                    <p>Every wholesale relationship is grounded in our commitment to honor God, care for Florida producers, and serve the communities stocking their shelves—with the steadfast character you expect from two veteran families.</p>
+                <div class="section-header">
+                    <span class="section-label">Best Value</span>
+                    <h2 id="bundles-title">Curated Beef Bundles</h2>
+                    <p class="section-description">Pre-selected combinations designed for families, grillers, and those who want variety without the guesswork. Save 15-25% compared to a la carte.</p>
                 </div>
-                <div class="values-grid">
-                    <article class="value-card">
-                        <h3>Gospel-Centered Service</h3>
-                        <p>We pray over every partnership and delivery, serving markets, churches, and nonprofits with humility and joy.</p>
+
+                <div class="bundle-grid">
+                    <article class="bundle-card">
+                        <div class="bundle-badge">Most Popular</div>
+                        <h3>Family Essentials</h3>
+                        <div class="bundle-price">
+                            <span class="price-amount">$199</span>
+                            <span class="price-detail">~25 lbs</span>
+                        </div>
+                        <ul class="bundle-contents">
+                            <li>5 lbs Ground Beef (80/20)</li>
+                            <li>4 Ribeye Steaks (1" thick)</li>
+                            <li>4 NY Strip Steaks</li>
+                            <li>1 Chuck Roast (3-4 lbs)</li>
+                            <li>2 lbs Stew Meat</li>
+                            <li>4 lbs Sirloin Steaks</li>
+                        </ul>
+                        <a href="#order" class="btn btn-primary btn-full">Order This Bundle</a>
                     </article>
-                    <article class="value-card">
-                        <h3>Regenerative Stewardship</h3>
-                        <p>We champion partners who steward their herds responsibly and share their practices transparently with the customers you serve.</p>
+
+                    <article class="bundle-card featured">
+                        <div class="bundle-badge">Best Value</div>
+                        <h3>Grillmaster's Choice</h3>
+                        <div class="bundle-price">
+                            <span class="price-amount">$349</span>
+                            <span class="price-detail">~40 lbs</span>
+                        </div>
+                        <ul class="bundle-contents">
+                            <li>6 Ribeye Steaks (1.25" thick)</li>
+                            <li>6 NY Strip Steaks</li>
+                            <li>4 Filet Mignon (8 oz each)</li>
+                            <li>2 T-Bone Steaks</li>
+                            <li>1 Tri-Tip Roast</li>
+                            <li>4 lbs Short Ribs</li>
+                            <li>6 lbs Ground Beef</li>
+                            <li>4 lbs Burger Patties</li>
+                        </ul>
+                        <a href="#order" class="btn btn-primary btn-full">Order This Bundle</a>
                     </article>
-                    <article class="value-card">
-                        <h3>Transparent Sourcing</h3>
-                        <p>Know your rancher. We facilitate farm visits, provide USDA paperwork, and communicate product availability in real time.</p>
+
+                    <article class="bundle-card">
+                        <div class="bundle-badge">Premium</div>
+                        <h3>Freezer Filler</h3>
+                        <div class="bundle-price">
+                            <span class="price-amount">$549</span>
+                            <span class="price-detail">~70 lbs</span>
+                        </div>
+                        <ul class="bundle-contents">
+                            <li>15 lbs Ground Beef</li>
+                            <li>8 Ribeye Steaks</li>
+                            <li>8 NY Strip Steaks</li>
+                            <li>6 Sirloin Steaks</li>
+                            <li>2 Chuck Roasts</li>
+                            <li>1 Prime Rib Roast (5-6 lbs)</li>
+                            <li>4 lbs Stew Meat</li>
+                            <li>3 lbs Short Ribs</li>
+                            <li>Soup Bones (free)</li>
+                        </ul>
+                        <a href="#order" class="btn btn-primary btn-full">Order This Bundle</a>
                     </article>
-                    <article class="value-card">
-                        <h3>Community Partnership</h3>
-                        <p>We tithe from every sale, support local food banks, and create ministry bundles that stretch budgets without cutting corners.</p>
+                </div>
+
+                <!-- Build Your Bundle -->
+                <div id="build-bundle" class="build-bundle">
+                    <div class="build-bundle-header">
+                        <h3>Build Your Own Bundle</h3>
+                        <p>Create a custom selection tailored to your family's preferences. Minimum 30 lbs to qualify for bundle pricing.</p>
+                    </div>
+                    <div class="build-bundle-content">
+                        <div class="build-steps">
+                            <div class="build-step">
+                                <span class="step-number">1</span>
+                                <div>
+                                    <strong>Choose Your Cuts</strong>
+                                    <p>Select from our full range of steaks, roasts, and ground beef</p>
+                                </div>
+                            </div>
+                            <div class="build-step">
+                                <span class="step-number">2</span>
+                                <div>
+                                    <strong>Set Quantities</strong>
+                                    <p>Tell us how many pounds of each cut you need</p>
+                                </div>
+                            </div>
+                            <div class="build-step">
+                                <span class="step-number">3</span>
+                                <div>
+                                    <strong>Get Your Quote</strong>
+                                    <p>We'll confirm pricing and delivery within 24 hours</p>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="#order" class="btn btn-secondary">Start Building Your Bundle</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Whole/Half Cow Section -->
+        <section class="bulk-section" aria-labelledby="bulk-title">
+            <div class="container">
+                <div class="bulk-grid">
+                    <div class="bulk-content">
+                        <span class="section-label">Ultimate Value</span>
+                        <h2 id="bulk-title">Half & Whole Cow Options</h2>
+                        <p>For serious beef lovers and families who want the best value. Work directly with us to customize your cut sheet and fill your freezer for the year.</p>
+                        <div class="bulk-options">
+                            <div class="bulk-option">
+                                <h4>Half Cow</h4>
+                                <span class="bulk-weight">~200-250 lbs</span>
+                                <span class="bulk-price">$7.50/lb hanging weight</span>
+                            </div>
+                            <div class="bulk-option">
+                                <h4>Whole Cow</h4>
+                                <span class="bulk-weight">~400-500 lbs</span>
+                                <span class="bulk-price">$6.75/lb hanging weight</span>
+                            </div>
+                        </div>
+                        <p class="bulk-note">*Hanging weight pricing. Final packaged weight typically 60-65% of hanging weight. Processing fees additional.</p>
+                        <a href="#contact" class="btn btn-primary">Inquire About Bulk Orders</a>
+                    </div>
+                    <div class="bulk-features">
+                        <div class="feature-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            <span>Custom cut sheet</span>
+                        </div>
+                        <div class="feature-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            <span>Choose your thickness</span>
+                        </div>
+                        <div class="feature-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            <span>Vacuum sealed packaging</span>
+                        </div>
+                        <div class="feature-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            <span>Free delivery included</span>
+                        </div>
+                        <div class="feature-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            <span>Ranch visit available</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Subscriptions Section -->
+        <section id="subscriptions" class="subscriptions" aria-labelledby="subscriptions-title">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-label">Set It & Forget It</span>
+                    <h2 id="subscriptions-title">Beef Subscriptions</h2>
+                    <p class="section-description">Never run out of premium beef. Choose your bundle, set your frequency, and we'll handle the rest. Pause or cancel anytime.</p>
+                </div>
+
+                <div class="subscription-grid">
+                    <article class="subscription-card">
+                        <h3>Monthly</h3>
+                        <p class="sub-description">Perfect for regular grillers and families of 2-4</p>
+                        <div class="sub-options">
+                            <div class="sub-option">
+                                <span class="sub-bundle">Family Essentials</span>
+                                <span class="sub-price">$189/mo</span>
+                                <span class="sub-savings">Save $10/month</span>
+                            </div>
+                            <div class="sub-option">
+                                <span class="sub-bundle">Grillmaster's Choice</span>
+                                <span class="sub-price">$329/mo</span>
+                                <span class="sub-savings">Save $20/month</span>
+                            </div>
+                        </div>
+                        <a href="#order" class="btn btn-outline btn-full">Subscribe Monthly</a>
+                    </article>
+
+                    <article class="subscription-card">
+                        <h3>Quarterly</h3>
+                        <p class="sub-description">Great balance of value and flexibility</p>
+                        <div class="sub-options">
+                            <div class="sub-option">
+                                <span class="sub-bundle">Family Essentials</span>
+                                <span class="sub-price">$549/quarter</span>
+                                <span class="sub-savings">Save $48/quarter</span>
+                            </div>
+                            <div class="sub-option">
+                                <span class="sub-bundle">Grillmaster's Choice</span>
+                                <span class="sub-price">$959/quarter</span>
+                                <span class="sub-savings">Save $88/quarter</span>
+                            </div>
+                        </div>
+                        <a href="#order" class="btn btn-outline btn-full">Subscribe Quarterly</a>
+                    </article>
+
+                    <article class="subscription-card featured">
+                        <div class="sub-badge">Best Value</div>
+                        <h3>6-Month</h3>
+                        <p class="sub-description">Maximum savings for committed beef lovers</p>
+                        <div class="sub-options">
+                            <div class="sub-option">
+                                <span class="sub-bundle">Freezer Filler x2</span>
+                                <span class="sub-price">$999/6 months</span>
+                                <span class="sub-savings">Save $99</span>
+                            </div>
+                            <div class="sub-option">
+                                <span class="sub-bundle">Custom Bundle</span>
+                                <span class="sub-price">Contact for quote</span>
+                                <span class="sub-savings">Build your own</span>
+                            </div>
+                        </div>
+                        <a href="#order" class="btn btn-primary btn-full">Subscribe 6-Month</a>
+                    </article>
+
+                    <article class="subscription-card">
+                        <h3>Annual</h3>
+                        <p class="sub-description">Half or whole cow, delivered on your schedule</p>
+                        <div class="sub-options">
+                            <div class="sub-option">
+                                <span class="sub-bundle">Half Cow</span>
+                                <span class="sub-price">From $1,500/year</span>
+                                <span class="sub-savings">Best per-lb price</span>
+                            </div>
+                            <div class="sub-option">
+                                <span class="sub-bundle">Whole Cow</span>
+                                <span class="sub-price">From $2,700/year</span>
+                                <span class="sub-savings">Ultimate value</span>
+                            </div>
+                        </div>
+                        <a href="#contact" class="btn btn-outline btn-full">Inquire About Annual</a>
                     </article>
                 </div>
-            </div>
-        </section>
 
-        <section class="process" aria-labelledby="process-title">
-            <div class="container process-grid">
-                <div>
-                    <h2 id="process-title">From Florida Partner to Your Counter</h2>
-                    <p>Our distribution playbook keeps every Prime order moving with integrity, traceability, and prayerful care from sourcing through delivery.</p>
-                    <ol>
-                        <li><strong>Source &amp; Inspect:</strong> Reserve Florida herds and hogs, verify USDA grades, and confirm availability windows.</li>
-                        <li><strong>Coordinate Processing:</strong> Align cut sheets with your specs and our partner butchers for consistent case-ready product.</li>
-                        <li><strong>Stage &amp; Store:</strong> Hold product in monitored cold storage, label by ranch and processor, and prep for your receiving team.</li>
-                        <li><strong>Deliver &amp; Support:</strong> Execute statewide delivery, share merchandising support, and tithe from every sale.</li>
-                    </ol>
-                </div>
-                <aside class="process-card">
-                    <h3>Serving Markets &amp; Ministries</h3>
-                    <p>We build curated boxes for farmers markets, neighborhood grocers, church outreaches, and hospitality partners who prioritize trustworthy proteins.</p>
-                    <ul>
-                        <li>Weekly market replenishment</li>
-                        <li>Chef and ministry menu planning</li>
-                        <li>Freezer filler bundles for outreaches</li>
-                        <li>Introductions to Florida ranch partners</li>
-                    </ul>
-                </aside>
-            </div>
-        </section>
-
-        <section class="cta" aria-labelledby="cta-title">
-            <div class="container cta-content">
-                <div>
-                    <h2 id="cta-title">Ready to Restock with Prime Florida Proteins?</h2>
-                    <p>Tell us about your market, ministry, or hospitality program and we&rsquo;ll craft a Prime beef and pork plan that arrives ready for your shelves.</p>
-                </div>
-                <a class="cta-button" href="#contact">Start the Conversation</a>
-            </div>
-        </section>
-
-        <section class="service-area" aria-labelledby="service-area-title">
-            <div class="container service-area-content">
-                <div>
-                    <p class="eyebrow">Serving the Sunshine State</p>
-                    <h2 id="service-area-title">Florida-Wide Delivery &amp; Partnerships</h2>
-                    <p class="service-area-copy">From the Panhandle to South Florida, we coordinate cold-chain logistics to keep Prime beef and pork pristine. Ask about weekly market drops, ministry freezer fills, and chef collaborations in every major metro—managed by our veteran family logistics team.</p>
-                </div>
-                <ul class="service-area-list">
-                    <li><strong>Retail &amp; Markets:</strong> Farmers markets, specialty grocers, and butcher counters</li>
-                    <li><strong>Hospitality Partners:</strong> Resorts, country clubs, and farm-to-table restaurants</li>
-                    <li><strong>Ministry Support:</strong> Church events, outreach programs, and food banks</li>
-                </ul>
-            </div>
-        </section>
-
-        <section id="collaboration" class="collaboration" aria-labelledby="collaboration-title">
-            <div class="container collaboration-grid">
-                <div>
-                    <p class="eyebrow">Calling Florida Creators</p>
-                    <h2 id="collaboration-title">Let&rsquo;s Team Up on Rubs &amp; Sauces</h2>
-                    <p class="collaboration-copy">We&rsquo;re searching for a Florida-based rub and sauce entrepreneur who shares our heart for honest ingredients and ministry-minded service. If you&rsquo;re building flavor that complements Prime beef and pork, let&rsquo;s explore co-branded offerings and bundled market drops.</p>
-                </div>
-                <div class="collaboration-card" role="complementary">
-                    <h3>What We&rsquo;re Offering</h3>
-                    <ul>
-                        <li>Distribution across our Florida market and ministry network</li>
-                        <li>Shared storytelling that points customers to Christ and community</li>
-                        <li>Packaging and fulfillment support alongside our protein deliveries</li>
-                    </ul>
-                    <p class="collaboration-cta">Use the contact form or call us to introduce your brand and sample lineup.</p>
+                <div class="subscription-benefits">
+                    <h4>All Subscriptions Include:</h4>
+                    <div class="benefits-grid">
+                        <div class="benefit">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            <span>Free delivery</span>
+                        </div>
+                        <div class="benefit">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            <span>Pause anytime</span>
+                        </div>
+                        <div class="benefit">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            <span>Swap bundles</span>
+                        </div>
+                        <div class="benefit">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            <span>Priority scheduling</span>
+                        </div>
+                        <div class="benefit">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            <span>Subscriber-only cuts</span>
+                        </div>
+                        <div class="benefit">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            <span>Recipe cards included</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
+        <!-- About Section -->
+        <section id="about" class="about" aria-labelledby="about-title">
+            <div class="container">
+                <div class="about-grid">
+                    <div class="about-content">
+                        <span class="section-label">Our Story</span>
+                        <h2 id="about-title">Veteran Families, Florida Roots</h2>
+                        <p>3 Strands Cattle Co. is owned and operated by two veteran families united by faith, service, and a passion for quality beef. We bring military discipline to every aspect of our operation while partnering with multi-generation Florida ranchers who share our values.</p>
+                        <p>Our mission is simple: glorify God through honest business, support local farmers, and provide your family with beef you can trust. Every cut is traceable, every relationship is stewarded with integrity, and a portion of every sale supports local food banks and ministries.</p>
+                        <blockquote>"A cord of three strands is not quickly broken." - Ecclesiastes 4:12</blockquote>
+                    </div>
+                    <div class="values-grid">
+                        <div class="value-card">
+                            <h4>Faith-Driven</h4>
+                            <p>We pray over every partnership and operate with Biblical integrity in all we do.</p>
+                        </div>
+                        <div class="value-card">
+                            <h4>Transparent</h4>
+                            <p>Know your rancher. We provide full traceability from pasture to package.</p>
+                        </div>
+                        <div class="value-card">
+                            <h4>Community-First</h4>
+                            <p>We tithe from every sale and support local food banks and ministries.</p>
+                        </div>
+                        <div class="value-card">
+                            <h4>Quality-Obsessed</h4>
+                            <p>Only Prime and Choice grades. We never compromise on what reaches your table.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Newsletter Section -->
+        <section class="newsletter" aria-labelledby="newsletter-title">
+            <div class="container">
+                <div class="newsletter-content">
+                    <div class="newsletter-text">
+                        <h2 id="newsletter-title">Stay in the Loop</h2>
+                        <p>Get exclusive offers, new product announcements, recipes, and updates from the ranch. We send 2-4 emails per month.</p>
+                    </div>
+                    <div class="newsletter-form">
+                        <!-- ConvertKit Form - REPLACE with your actual ConvertKit form code -->
+                        <!-- Get your form at: https://app.convertkit.com/forms -->
+                        <form action="https://app.convertkit.com/forms/YOUR_FORM_ID/subscriptions" method="post" class="convertkit-form">
+                            <div class="form-row">
+                                <input type="email" name="email_address" placeholder="Enter your email" required>
+                                <button type="submit" class="btn btn-primary">Subscribe</button>
+                            </div>
+                            <p class="form-note">No spam, ever. Unsubscribe anytime.</p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Order Section -->
+        <section id="order" class="order-section" aria-labelledby="order-title">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-label">Ready to Order?</span>
+                    <h2 id="order-title">Choose How You'd Like to Order</h2>
+                    <p class="section-description">We accept all major credit cards through Square. Create an account to save payment info and track orders.</p>
+                </div>
+
+                <div class="order-options">
+                    <div class="order-option">
+                        <div class="order-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                        </div>
+                        <h3>Quick Checkout</h3>
+                        <p>Order bundles or a la carte items directly. No account needed.</p>
+                        <!-- REPLACE with your Square Online store link -->
+                        <a href="https://square.link/u/YOUR_SQUARE_LINK" class="btn btn-primary" target="_blank" rel="noopener">Shop Now</a>
+                    </div>
+
+                    <div class="order-option">
+                        <div class="order-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </div>
+                        <h3>Create Account</h3>
+                        <p>Save payment info, track orders, manage subscriptions.</p>
+                        <!-- REPLACE with your Square Online account/login link -->
+                        <a href="https://square.link/u/YOUR_ACCOUNT_LINK" class="btn btn-secondary" target="_blank" rel="noopener">Sign Up / Login</a>
+                    </div>
+
+                    <div class="order-option">
+                        <div class="order-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        </div>
+                        <h3>Custom Order</h3>
+                        <p>Build your own bundle, bulk orders, or special requests.</p>
+                        <a href="#contact" class="btn btn-outline">Contact Us</a>
+                    </div>
+                </div>
+
+                <div class="payment-info">
+                    <p><strong>We Accept:</strong></p>
+                    <div class="payment-icons">
+                        <span class="payment-method">Visa</span>
+                        <span class="payment-method">Mastercard</span>
+                        <span class="payment-method">Amex</span>
+                        <span class="payment-method">Discover</span>
+                        <span class="payment-method">Apple Pay</span>
+                        <span class="payment-method">Google Pay</span>
+                    </div>
+                    <p class="security-note">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="lock-icon"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        Secure payments powered by Square
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
         <section id="contact" class="contact" aria-labelledby="contact-title">
-            <div class="container contact-grid">
-                <div class="contact-info-card">
-                    <h2 id="contact-title">Contact Us</h2>
-                    <p>Share how we can serve you. Whether you need a custom cut sheet, ministry partnership, or introductions to our partner ranchers, our team is ready to help.</p>
-                    <div class="contact-details">
-                        <p><strong>Email:</strong> info@3strands.co</p>
-                        <p><strong>Phone:</strong> <a href="tel:+15619179047">(561) 917-9047</a></p>
-                        <p><strong>Service Area:</strong> State of Florida</p>
+            <div class="container">
+                <div class="contact-grid">
+                    <div class="contact-info">
+                        <h2 id="contact-title">Get in Touch</h2>
+                        <p>Have questions about our beef, custom orders, or want to discuss bulk purchases? We're here to help.</p>
+
+                        <div class="contact-methods">
+                            <div class="contact-method">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                <div>
+                                    <strong>Email</strong>
+                                    <a href="mailto:info@3strands.co">info@3strands.co</a>
+                                </div>
+                            </div>
+                            <div class="contact-method">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                <div>
+                                    <strong>Phone</strong>
+                                    <a href="tel:+15619179047">(561) 917-9047</a>
+                                </div>
+                            </div>
+                            <div class="contact-method">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                <div>
+                                    <strong>Service Area</strong>
+                                    <span>State of Florida</span>
+                                </div>
+                            </div>
+                            <div class="contact-method">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                                <div>
+                                    <strong>Live Chat</strong>
+                                    <span>Mon-Sat 7am-9pm, Sun 12-4pm ET</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
+                    <form class="contact-form" action="https://formsubmit.co/info@3strands.co" data-formsubmit-endpoint="https://formsubmit.co/ajax/info@3strands.co" method="post" novalidate>
+                        <input type="hidden" name="website_header" value="3 Strands Cattle Co. Website Inquiry">
+                        <input type="hidden" name="_subject" value="[3 Strands Website] New inquiry received">
+                        <input type="hidden" name="_template" value="table">
+                        <input type="hidden" name="_captcha" value="false">
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="name">Name *</label>
+                                <input type="text" id="name" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email *</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">Phone</label>
+                            <input type="tel" id="phone" name="phone">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inquiry-type">Inquiry Type</label>
+                            <select id="inquiry-type" name="inquiry_type">
+                                <option value="">Select an option</option>
+                                <option value="order">Place an Order</option>
+                                <option value="custom-bundle">Custom Bundle Request</option>
+                                <option value="bulk">Half/Whole Cow Inquiry</option>
+                                <option value="subscription">Subscription Question</option>
+                                <option value="partnership">Partnership Opportunity</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message">Message *</label>
+                            <textarea id="message" name="message" rows="5" required placeholder="Tell us how we can help..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-full">Send Message</button>
+                        <p class="form-note">We'll respond within 1 business day.</p>
+                        <p class="form-status" role="status" aria-live="polite"></p>
+                    </form>
                 </div>
-                <form class="contact-form" action="https://formsubmit.co/info@3strands.co" data-formsubmit-endpoint="https://formsubmit.co/ajax/info@3strands.co" method="post" novalidate>
-                    <input type="hidden" name="website_header" value="3 Strands Cattle Co. Website Inquiry">
-                    <div class="form-group">
-                        <label for="name">Name</label>
-                        <input type="text" id="name" name="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="organization">Organization</label>
-                        <input type="text" id="organization" name="organization" placeholder="Restaurant, ministry, or family">
-                    </div>
-                    <div class="form-group">
-                        <label for="message">How can we serve you?</label>
-                        <textarea id="message" name="message" rows="5" required></textarea>
-                    </div>
-                    <input type="hidden" name="_subject" value="[3 Strands Website] New inquiry received">
-                    <input type="hidden" name="_template" value="table">
-                    <input type="hidden" name="_captcha" value="false">
-                    <button type="submit" class="cta-button">Send Message</button>
-                    <p class="form-footnote">We&rsquo;ll follow up within one business day.</p>
-                    <p class="form-status" role="status" aria-live="polite"></p>
-                </form>
             </div>
         </section>
     </main>
 
     <footer class="site-footer">
-        <div class="container footer-content">
-            <div class="footer-branding">
-                <img src="assets/img/logo.png" alt="3 Strands Cattle Co. logo" class="footer-logo" width="62" height="62" loading="lazy">
-                <div>
-                    <p class="footer-brand">&copy; <span id="year"></span> 3 Strands Cattle Co.</p>
-                    <p>Veteran family owned, faith-driven distribution for families, ministries, and chefs.</p>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <img src="assets/img/logo.png" alt="3 Strands Cattle Co." class="footer-logo" width="48" height="48" loading="lazy">
+                    <div>
+                        <p class="footer-name">3 Strands Cattle Co.</p>
+                        <p class="footer-tagline">Veteran owned. Faith driven. Florida sourced.</p>
+                    </div>
+                </div>
+
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#products">Products</a></li>
+                        <li><a href="#bundles">Bundles</a></li>
+                        <li><a href="#subscriptions">Subscriptions</a></li>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-contact">
+                    <h4>Contact</h4>
+                    <p><a href="mailto:info@3strands.co">info@3strands.co</a></p>
+                    <p><a href="tel:+15619179047">(561) 917-9047</a></p>
+                    <p>Serving all of Florida</p>
+                </div>
+
+                <div class="footer-hours">
+                    <h4>Chat Hours</h4>
+                    <p>Mon-Sat: 7am - 9pm ET</p>
+                    <p>Sunday: 12pm - 4pm ET</p>
                 </div>
             </div>
-            <div class="footer-flag" aria-hidden="true">
-                <svg class="footer-flag-graphic" viewBox="0 0 190 100" role="img">
-                    <defs>
-                        <linearGradient id="flag-stripe-red" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#9d3d28" />
-                            <stop offset="100%" stop-color="#6f2416" />
-                        </linearGradient>
-                        <linearGradient id="flag-stripe-ivory" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#f4e7cf" />
-                            <stop offset="100%" stop-color="#d7b894" />
-                        </linearGradient>
-                        <linearGradient id="flag-union" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#32455a" />
-                            <stop offset="100%" stop-color="#1f2c3c" />
-                        </linearGradient>
-                        <linearGradient id="flag-wear" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="rgba(255, 255, 255, 0.18)" />
-                            <stop offset="40%" stop-color="rgba(255, 255, 255, 0.05)" />
-                            <stop offset="100%" stop-color="rgba(0, 0, 0, 0.12)" />
-                        </linearGradient>
-                    </defs>
-                    <g>
-                        <rect width="190" height="100" fill="url(#flag-stripe-ivory)"></rect>
-                        <g fill="url(#flag-stripe-red)">
-                            <rect y="0" width="190" height="7.7"></rect>
-                            <rect y="15.4" width="190" height="7.7"></rect>
-                            <rect y="30.8" width="190" height="7.7"></rect>
-                            <rect y="46.2" width="190" height="7.7"></rect>
-                            <rect y="61.6" width="190" height="7.7"></rect>
-                            <rect y="77" width="190" height="7.7"></rect>
-                            <rect y="92.3" width="190" height="7.7"></rect>
-                        </g>
-                        <g fill="url(#flag-union)">
-                            <rect width="76" height="53.9"></rect>
-                            <g fill="#e8e2d7" opacity="0.9">
-                                <circle cx="7.6" cy="6.6" r="2.1"></circle>
-                                <circle cx="19" cy="6.6" r="2.1"></circle>
-                                <circle cx="30.4" cy="6.6" r="2.1"></circle>
-                                <circle cx="41.8" cy="6.6" r="2.1"></circle>
-                                <circle cx="53.2" cy="6.6" r="2.1"></circle>
-                                <circle cx="64.6" cy="6.6" r="2.1"></circle>
-                                <circle cx="13.3" cy="14.1" r="2.1"></circle>
-                                <circle cx="24.7" cy="14.1" r="2.1"></circle>
-                                <circle cx="36.1" cy="14.1" r="2.1"></circle>
-                                <circle cx="47.5" cy="14.1" r="2.1"></circle>
-                                <circle cx="58.9" cy="14.1" r="2.1"></circle>
-                                <circle cx="70.3" cy="14.1" r="2.1"></circle>
-                                <circle cx="7.6" cy="21.6" r="2.1"></circle>
-                                <circle cx="19" cy="21.6" r="2.1"></circle>
-                                <circle cx="30.4" cy="21.6" r="2.1"></circle>
-                                <circle cx="41.8" cy="21.6" r="2.1"></circle>
-                                <circle cx="53.2" cy="21.6" r="2.1"></circle>
-                                <circle cx="64.6" cy="21.6" r="2.1"></circle>
-                                <circle cx="13.3" cy="29.1" r="2.1"></circle>
-                                <circle cx="24.7" cy="29.1" r="2.1"></circle>
-                                <circle cx="36.1" cy="29.1" r="2.1"></circle>
-                                <circle cx="47.5" cy="29.1" r="2.1"></circle>
-                                <circle cx="58.9" cy="29.1" r="2.1"></circle>
-                                <circle cx="70.3" cy="29.1" r="2.1"></circle>
-                                <circle cx="7.6" cy="36.6" r="2.1"></circle>
-                                <circle cx="19" cy="36.6" r="2.1"></circle>
-                                <circle cx="30.4" cy="36.6" r="2.1"></circle>
-                                <circle cx="41.8" cy="36.6" r="2.1"></circle>
-                                <circle cx="53.2" cy="36.6" r="2.1"></circle>
-                                <circle cx="64.6" cy="36.6" r="2.1"></circle>
-                                <circle cx="13.3" cy="44.1" r="2.1"></circle>
-                                <circle cx="24.7" cy="44.1" r="2.1"></circle>
-                                <circle cx="36.1" cy="44.1" r="2.1"></circle>
-                                <circle cx="47.5" cy="44.1" r="2.1"></circle>
-                                <circle cx="58.9" cy="44.1" r="2.1"></circle>
-                                <circle cx="70.3" cy="44.1" r="2.1"></circle>
-                            </g>
-                        </g>
-                        <rect width="190" height="100" fill="url(#flag-wear)"></rect>
-                    </g>
-                </svg>
+
+            <div class="footer-bottom">
+                <p>&copy; <span id="year"></span> 3 Strands Cattle Co. All rights reserved.</p>
+                <div class="footer-flag" aria-hidden="true">
+                    <span class="flag-emoji">🇺🇸</span>
+                    <span>Veteran Owned</span>
+                </div>
             </div>
         </div>
     </footer>
