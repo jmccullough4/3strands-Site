@@ -107,6 +107,16 @@
         }
     };
 
+    // Hide widget when chat is minimized - force users through pre-chat form
+    Tawk_API.onChatMinimized = function() {
+        Tawk_API.hideWidget();
+    };
+
+    // Hide widget when chat ends
+    Tawk_API.onChatEnded = function() {
+        Tawk_API.hideWidget();
+    };
+
     // Show pre-chat modal
     function showPrechatModal() {
         document.getElementById('prechat-modal').style.display = 'flex';
