@@ -1631,6 +1631,16 @@ main,
         margin-top: var(--space-md);
     }
 
+    /* Header brand */
+    .brand-name {
+        font-size: 0.95rem;
+    }
+
+    .brand-logo {
+        width: 40px;
+        height: 40px;
+    }
+
     /* Hero */
     .hero-actions {
         flex-direction: column;
@@ -1647,14 +1657,59 @@ main,
         text-align: center;
     }
 
-    /* Bundles */
+    /* Product Categories - Single column on mobile */
+    .product-categories {
+        grid-template-columns: 1fr;
+    }
+
+    .category-card h3 {
+        font-size: 1.25rem;
+    }
+
+    .price-list li {
+        font-size: 0.9rem;
+        padding: var(--space-sm) 0;
+    }
+
+    /* Bundles - Single column on mobile */
+    .bundle-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .bundle-card {
+        padding: var(--space-lg);
+    }
+
+    .bundle-card h3 {
+        font-size: 1.25rem;
+    }
+
+    .price-amount {
+        font-size: 1.75rem;
+    }
+
+    .bundle-contents li {
+        font-size: 0.875rem;
+    }
+
+    /* Bulk/Build options */
     .bulk-options {
+        grid-template-columns: 1fr;
+    }
+
+    /* Subscriptions */
+    .subscription-grid {
         grid-template-columns: 1fr;
     }
 
     /* Values */
     .values-grid {
         grid-template-columns: 1fr;
+    }
+
+    /* Build Bundle Steps */
+    .build-steps {
+        flex-direction: column;
     }
 
     /* Form */
@@ -1690,21 +1745,161 @@ main,
         padding: 0 var(--space-md);
     }
 
+    /* Header */
+    .brand-name {
+        font-size: 0.85rem;
+    }
+
+    .brand-logo {
+        width: 36px;
+        height: 36px;
+    }
+
+    .brand-link {
+        gap: var(--space-sm);
+    }
+
+    /* Hero */
     .hero {
         padding: var(--space-2xl) 0;
+    }
+
+    h1 {
+        font-size: 1.75rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    .hero-description {
+        font-size: 0.95rem;
     }
 
     .hero-card {
         padding: var(--space-lg);
     }
 
-    .bundle-card,
-    .subscription-card,
+    .hero-card h3 {
+        font-size: 1.1rem;
+    }
+
+    /* Sections */
+    .section-header {
+        margin-bottom: var(--space-xl);
+    }
+
+    .section-description {
+        font-size: 0.9rem;
+    }
+
+    /* Products */
     .category-card {
+        padding: var(--space-md);
+    }
+
+    .category-card h3 {
+        font-size: 1.1rem;
+    }
+
+    .price-list li {
+        font-size: 0.85rem;
+        flex-wrap: wrap;
+        gap: var(--space-xs);
+    }
+
+    .price-list li span:first-child {
+        flex: 1 1 60%;
+    }
+
+    .price {
+        font-size: 0.9rem;
+    }
+
+    /* Bundles */
+    .bundle-card,
+    .subscription-card {
+        padding: var(--space-md);
+    }
+
+    .bundle-card h3 {
+        font-size: 1.1rem;
+    }
+
+    .price-amount {
+        font-size: 1.5rem;
+    }
+
+    .price-detail {
+        font-size: 0.75rem;
+    }
+
+    .bundle-contents {
+        padding-left: var(--space-md);
+    }
+
+    .bundle-contents li {
+        font-size: 0.8rem;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: var(--space-sm) var(--space-md);
+        font-size: 0.875rem;
+    }
+
+    .btn-full {
+        padding: var(--space-sm) var(--space-md);
+    }
+
+    /* Build Bundle */
+    .build-bundle {
         padding: var(--space-lg);
     }
 
+    .build-step {
+        flex-direction: column;
+        text-align: center;
+        gap: var(--space-sm);
+    }
+
+    .step-number {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+
+    /* Forms */
     .contact-form {
         padding: var(--space-lg);
+    }
+
+    input, textarea, select {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+
+    /* Chat Banner */
+    .chat-info {
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+
+    .chat-hours {
+        font-size: 0.8rem;
+    }
+
+    /* About */
+    .about-image {
+        max-height: 250px;
+    }
+
+    /* Values */
+    .value-card {
+        padding: var(--space-md);
+    }
+
+    /* Footer */
+    .site-footer {
+        padding: var(--space-2xl) 0 var(--space-lg);
     }
 }
