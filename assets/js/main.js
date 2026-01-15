@@ -211,9 +211,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================================
-    // Newsletter Form Handling (ConvertKit)
+    // Newsletter Form Handling (Kit)
     // =========================================================================
-    const newsletterForm = document.querySelector('.convertkit-form');
+    const newsletterForm = document.querySelector('.kit-form');
 
     if (newsletterForm) {
         newsletterForm.addEventListener('submit', async (event) => {
