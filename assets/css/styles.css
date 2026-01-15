@@ -1179,12 +1179,12 @@ main,
     max-width: 480px;
 }
 
-.convertkit-form .form-row {
+.kit-form .form-row {
     display: flex;
     gap: var(--space-sm);
 }
 
-.convertkit-form input[type="email"] {
+.kit-form input[type="email"] {
     flex: 1;
     padding: var(--space-md) var(--space-lg);
     border: none;
@@ -1192,12 +1192,12 @@ main,
     font-size: 1rem;
 }
 
-.convertkit-form input[type="email"]:focus {
+.kit-form input[type="email"]:focus {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
 }
 
-.convertkit-form .form-note {
+.kit-form .form-note {
     font-size: 0.8125rem;
     color: rgba(255, 255, 255, 0.7);
     margin: var(--space-sm) 0 0;
@@ -1657,7 +1657,7 @@ main,
         grid-template-columns: 1fr;
     }
 
-    .convertkit-form .form-row {
+    .kit-form .form-row {
         flex-direction: column;
     }
 
