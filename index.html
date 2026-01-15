@@ -17,9 +17,49 @@
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body id="top">
+    <!-- Pre-Chat Form Modal -->
+    <div id="prechat-modal" class="prechat-modal" style="display: none;">
+        <div class="prechat-overlay"></div>
+        <div class="prechat-content">
+            <button type="button" class="prechat-close" aria-label="Close">&times;</button>
+            <div class="prechat-header">
+                <h3>Start a Conversation</h3>
+                <p>Please provide your info so we can follow up if you need to step away.</p>
+            </div>
+            <form id="prechat-form" class="prechat-form">
+                <div class="prechat-field">
+                    <label for="prechat-name">Name *</label>
+                    <input type="text" id="prechat-name" name="name" required placeholder="Your name">
+                </div>
+                <div class="prechat-field">
+                    <label for="prechat-email">Email *</label>
+                    <input type="email" id="prechat-email" name="email" required placeholder="your@email.com">
+                </div>
+                <div class="prechat-field">
+                    <label for="prechat-topic">What can we help you with? *</label>
+                    <select id="prechat-topic" name="topic" required>
+                        <option value="">Select a topic...</option>
+                        <option value="New Order">New Order</option>
+                        <option value="Existing Order">Existing Order Question</option>
+                        <option value="Subscription">Subscription Inquiry</option>
+                        <option value="Bulk/Wholesale">Bulk or Wholesale</option>
+                        <option value="Delivery">Delivery Question</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Start Chat</button>
+            </form>
+            <p class="prechat-hours">
+                <strong>Chat Hours:</strong> Mon-Sat 7am-9pm | Sun 12pm-4pm ET<br>
+                <small>We'll email you if we miss your message!</small>
+            </p>
+        </div>
+    </div>
+
     <!-- Tawk.to Live Chat - Business hours: M-Sat 7am-9pm, Sun 12-4pm ET -->
     <script type="text/javascript">
     var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    var visitorInfo = {};
 
     // Check if within business hours (Eastern Time)
     function isWithinBusinessHours() {
@@ -57,13 +97,85 @@
         zIndex: 1000
     };
 
+    // Hide widget by default - we'll show pre-chat form first
     Tawk_API.onLoad = function() {
+        Tawk_API.hideWidget();
         if (!isWithinBusinessHours()) {
             Tawk_API.setAttributes({
                 'status': 'offline'
             });
         }
     };
+
+    // Show pre-chat modal
+    function showPrechatModal() {
+        document.getElementById('prechat-modal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    // Hide pre-chat modal
+    function hidePrechatModal() {
+        document.getElementById('prechat-modal').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    // Handle pre-chat form submission
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('prechat-modal');
+        const form = document.getElementById('prechat-form');
+        const closeBtn = modal.querySelector('.prechat-close');
+        const overlay = modal.querySelector('.prechat-overlay');
+
+        // Close modal handlers
+        closeBtn.addEventListener('click', hidePrechatModal);
+        overlay.addEventListener('click', hidePrechatModal);
+
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('prechat-name').value;
+            const email = document.getElementById('prechat-email').value;
+            const topic = document.getElementById('prechat-topic').value;
+
+            // Store visitor info
+            visitorInfo = { name, email, topic };
+
+            // Set Tawk.to visitor attributes so you can see their info
+            if (typeof Tawk_API !== 'undefined' && Tawk_API.setAttributes) {
+                Tawk_API.setAttributes({
+                    'name': name,
+                    'email': email,
+                    'topic': topic
+                }, function(error) {
+                    if (error) console.log('Tawk attribute error:', error);
+                });
+            }
+
+            // Also add tags for easy filtering
+            if (typeof Tawk_API !== 'undefined' && Tawk_API.addTags) {
+                Tawk_API.addTags([topic], function(error) {
+                    if (error) console.log('Tawk tag error:', error);
+                });
+            }
+
+            // Hide modal and show/maximize chat
+            hidePrechatModal();
+
+            if (typeof Tawk_API !== 'undefined') {
+                Tawk_API.showWidget();
+                Tawk_API.maximize();
+            }
+
+            // Clear form for next time
+            form.reset();
+        });
+    });
+
+    // Global function to open chat (called by buttons)
+    function openChat() {
+        showPrechatModal();
+    }
 
     (function(){
     var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
@@ -162,7 +274,7 @@
                             <span class="chat-hours">Mon-Sat 7am-9pm | Sun 12pm-4pm ET</span>
                         </div>
                     </div>
-                    <button class="btn btn-chat" onclick="if(typeof Tawk_API !== 'undefined') Tawk_API.maximize();">Start Chat</button>
+                    <button class="btn btn-chat" onclick="openChat();">Start Chat</button>
                 </div>
             </div>
         </section>
