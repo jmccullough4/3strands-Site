@@ -676,6 +676,11 @@ main,
     color: var(--color-primary);
 }
 
+.price.sold-out {
+    color: var(--color-error);
+    font-style: italic;
+}
+
 .products-cta {
     text-align: center;
 }
