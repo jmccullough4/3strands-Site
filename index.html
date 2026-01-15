@@ -40,6 +40,23 @@
         }
     }
 
+    // Customize widget appearance - cleaner, more modern look
+    Tawk_API.customStyle = {
+        visibility: {
+            desktop: {
+                position: 'br',
+                xOffset: 20,
+                yOffset: 20
+            },
+            mobile: {
+                position: 'br',
+                xOffset: 10,
+                yOffset: 10
+            }
+        },
+        zIndex: 1000
+    };
+
     Tawk_API.onLoad = function() {
         if (!isWithinBusinessHours()) {
             Tawk_API.setAttributes({
@@ -58,6 +75,20 @@
     })();
     </script>
     <!-- End Tawk.to -->
+
+    <!-- Tawk.to Custom Styling - Hide branding and reduce animations -->
+    <style>
+        /* Reduce bouncy animations on the widget */
+        #tawk-bubble-container,
+        .tawk-min-container,
+        [id^="tawk-"] {
+            animation-duration: 0.15s !important;
+            transition-duration: 0.15s !important;
+        }
+        /* Disable bounce/pulse animations */
+        @keyframes tawk-bounce { 0%, 100% { transform: scale(1); } }
+        @keyframes tawk-pulse { 0%, 100% { opacity: 1; } }
+    </style>
 
     <header class="site-header">
         <div class="container header-content">
@@ -113,7 +144,7 @@
                     <div class="hero-card">
                         <div class="hero-card-badge">Now Available</div>
                         <h3>Premium Beef Bundles</h3>
-                        <p>Curated selections starting at $199</p>
+                        <p>Curated selections starting at $199.99</p>
                         <a href="#bundles" class="btn btn-outline">Explore Bundles</a>
                     </div>
                 </div>
@@ -150,14 +181,21 @@
                         <div class="category-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
                         </div>
-                        <h3>Steaks</h3>
+                        <h3>Premium Steaks</h3>
                         <ul class="price-list">
-                            <li><span>Ribeye (Bone-In)</span><span class="price">$28/lb</span></li>
-                            <li><span>NY Strip</span><span class="price">$26/lb</span></li>
-                            <li><span>Filet Mignon</span><span class="price">$38/lb</span></li>
-                            <li><span>T-Bone</span><span class="price">$24/lb</span></li>
-                            <li><span>Sirloin</span><span class="price">$18/lb</span></li>
-                            <li><span>Flank Steak</span><span class="price">$16/lb</span></li>
+                            <li><span>Eye of Ribeye Steak</span><span class="price">$44.99</span></li>
+                            <li><span>Kansas City Steak</span><span class="price">$44.99</span></li>
+                            <li><span>Filet Mignon</span><span class="price">$34.99</span></li>
+                            <li><span>Ribeye Steak</span><span class="price">$24.99</span></li>
+                            <li><span>NY Strip Steak</span><span class="price">$21.99</span></li>
+                            <li><span>Ribeye Cap - Picanha</span><span class="price">$21.49</span></li>
+                            <li><span>Sirloin Plus Steak</span><span class="price">$17.99</span></li>
+                            <li><span>Sirloin Tip Steak</span><span class="price">$17.99</span></li>
+                            <li><span>Flat Iron Steak</span><span class="price">$17.99</span></li>
+                            <li><span>Denver Eye Steak</span><span class="price">$14.99</span></li>
+                            <li><span>Petite Sirloin Steak</span><span class="price">$10.99</span></li>
+                            <li><span>Plate Steak</span><span class="price">$8.99</span></li>
+                            <li><span>Denver Steak</span><span class="price">$7.99</span></li>
                         </ul>
                     </div>
 
@@ -167,11 +205,11 @@
                         </div>
                         <h3>Roasts</h3>
                         <ul class="price-list">
-                            <li><span>Prime Rib Roast</span><span class="price">$22/lb</span></li>
-                            <li><span>Chuck Roast</span><span class="price">$12/lb</span></li>
-                            <li><span>Brisket (Whole)</span><span class="price">$14/lb</span></li>
-                            <li><span>Tri-Tip</span><span class="price">$16/lb</span></li>
-                            <li><span>Rump Roast</span><span class="price">$11/lb</span></li>
+                            <li><span>Tri Tip Roast</span><span class="price">$14.99</span></li>
+                            <li><span>Sirloin Tip Roast</span><span class="price">$8.99</span></li>
+                            <li><span>Eye Round Roast</span><span class="price">$8.99</span></li>
+                            <li><span>Chuck Roast</span><span class="price">$6.99</span></li>
+                            <li><span>Rump Roast</span><span class="price">$5.49</span></li>
                         </ul>
                     </div>
 
@@ -181,12 +219,14 @@
                         </div>
                         <h3>Ground & More</h3>
                         <ul class="price-list">
-                            <li><span>Ground Beef (80/20)</span><span class="price">$9/lb</span></li>
-                            <li><span>Ground Beef (90/10)</span><span class="price">$11/lb</span></li>
-                            <li><span>Stew Meat</span><span class="price">$12/lb</span></li>
-                            <li><span>Short Ribs</span><span class="price">$15/lb</span></li>
-                            <li><span>Beef Shanks</span><span class="price">$10/lb</span></li>
-                            <li><span>Oxtail</span><span class="price">$14/lb</span></li>
+                            <li><span>Brisket</span><span class="price">$8.99</span></li>
+                            <li><span>Ground Beef</span><span class="price">$7.49</span></li>
+                            <li><span>London Broil</span><span class="price">$7.49</span></li>
+                            <li><span>Short Rib Burnt In</span><span class="price">$6.99</span></li>
+                            <li><span>Stew Beef</span><span class="price">$6.99</span></li>
+                            <li><span>Bone Steak</span><span class="price">$6.99</span></li>
+                            <li><span>Beef Belly</span><span class="price">$6.49</span></li>
+                            <li><span>Cross Cut Shank</span><span class="price">$5.99</span></li>
                         </ul>
                     </div>
 
@@ -194,20 +234,31 @@
                         <div class="category-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                         </div>
-                        <h3>Specialty</h3>
+                        <h3>Specialty & Offal</h3>
                         <ul class="price-list">
-                            <li><span>Beef Liver</span><span class="price">$6/lb</span></li>
-                            <li><span>Beef Heart</span><span class="price">$7/lb</span></li>
-                            <li><span>Beef Tongue</span><span class="price">$12/lb</span></li>
-                            <li><span>Marrow Bones</span><span class="price">$5/lb</span></li>
-                            <li><span>Soup Bones</span><span class="price">$4/lb</span></li>
+                            <li><span>Beef Heart</span><span class="price">$7.99</span></li>
+                            <li><span>Beef Liver</span><span class="price">$7.49</span></li>
+                            <li><span>Beef Tongue</span><span class="price">$6.99</span></li>
+                            <li><span>Marrow Bone Split</span><span class="price">$4.49</span></li>
+                            <li><span>Soup Bones</span><span class="price">$4.49</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="category-card">
+                        <div class="category-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="12" rx="10" ry="6"/><path d="M12 6c5.523 0 10 2.686 10 6s-4.477 6-10 6S2 15.314 2 12s4.477-6 10-6z"/></svg>
+                        </div>
+                        <h3>Farm Fresh Eggs</h3>
+                        <ul class="price-list">
+                            <li><span>Half Dozen Eggs</span><span class="price">Available</span></li>
+                            <li><span>Dozen Eggs</span><span class="price">Available</span></li>
                         </ul>
                     </div>
                 </div>
 
                 <div class="products-cta">
-                    <p>Prices are per pound. Minimum order: 10 lbs for a la carte items.</p>
-                    <a href="https://cash.app/order/$3strandsbeef" class="btn btn-primary" target="_blank" rel="noopener">Place A La Carte Order</a>
+                    <p>Prices are per pound. Order online through Cash App for pickup or delivery.</p>
+                    <a href="https://cash.app/order/$3strandsbeef" class="btn btn-primary" target="_blank" rel="noopener">Shop Our Full Menu</a>
                 </div>
             </div>
         </section>
@@ -223,60 +274,81 @@
 
                 <div class="bundle-grid">
                     <article class="bundle-card">
-                        <div class="bundle-badge">Most Popular</div>
-                        <h3>Family Essentials</h3>
+                        <div class="bundle-badge">Starter</div>
+                        <h3>Frozen 10 Bundle</h3>
                         <div class="bundle-price">
-                            <span class="price-amount">$199</span>
-                            <span class="price-detail">~25 lbs</span>
+                            <span class="price-amount">$199.99</span>
+                            <span class="price-detail">Great for trying us out</span>
                         </div>
                         <ul class="bundle-contents">
-                            <li>5 lbs Ground Beef (80/20)</li>
-                            <li>4 Ribeye Steaks (1" thick)</li>
-                            <li>4 NY Strip Steaks</li>
-                            <li>1 Chuck Roast (3-4 lbs)</li>
-                            <li>2 lbs Stew Meat</li>
-                            <li>4 lbs Sirloin Steaks</li>
+                            <li>Perfect introduction to our beef</li>
+                            <li>Mix of premium cuts</li>
+                            <li>Ideal for smaller households</li>
+                            <li>See full contents on menu</li>
+                        </ul>
+                        <a href="https://cash.app/order/$3strandsbeef" class="btn btn-primary btn-full" target="_blank" rel="noopener">Order This Bundle</a>
+                    </article>
+
+                    <article class="bundle-card">
+                        <div class="bundle-badge">Popular</div>
+                        <h3>Cookout Cuts Bundle</h3>
+                        <div class="bundle-price">
+                            <span class="price-amount">$389.99</span>
+                            <span class="price-detail">Perfect for grilling</span>
+                        </div>
+                        <ul class="bundle-contents">
+                            <li>Grill-ready selection</li>
+                            <li>Premium steaks included</li>
+                            <li>Great for entertaining</li>
+                            <li>See full contents on menu</li>
+                        </ul>
+                        <a href="https://cash.app/order/$3strandsbeef" class="btn btn-primary btn-full" target="_blank" rel="noopener">Order This Bundle</a>
+                    </article>
+
+                    <article class="bundle-card">
+                        <div class="bundle-badge">Value</div>
+                        <h3>Heart and Soul Bundle</h3>
+                        <div class="bundle-price">
+                            <span class="price-amount">$649.99</span>
+                            <span class="price-detail">Family favorite</span>
+                        </div>
+                        <ul class="bundle-contents">
+                            <li>Wide variety of cuts</li>
+                            <li>Steaks, roasts, and ground</li>
+                            <li>Feeds the whole family</li>
+                            <li>See full contents on menu</li>
                         </ul>
                         <a href="https://cash.app/order/$3strandsbeef" class="btn btn-primary btn-full" target="_blank" rel="noopener">Order This Bundle</a>
                     </article>
 
                     <article class="bundle-card featured">
                         <div class="bundle-badge">Best Value</div>
-                        <h3>Grillmaster's Choice</h3>
+                        <h3>Freezer Abundance Bundle</h3>
                         <div class="bundle-price">
-                            <span class="price-amount">$349</span>
-                            <span class="price-detail">~40 lbs</span>
+                            <span class="price-amount">$669.99</span>
+                            <span class="price-detail">Stock your freezer</span>
                         </div>
                         <ul class="bundle-contents">
-                            <li>6 Ribeye Steaks (1.25" thick)</li>
-                            <li>6 NY Strip Steaks</li>
-                            <li>4 Filet Mignon (8 oz each)</li>
-                            <li>2 T-Bone Steaks</li>
-                            <li>1 Tri-Tip Roast</li>
-                            <li>4 lbs Short Ribs</li>
-                            <li>6 lbs Ground Beef</li>
-                            <li>4 lbs Burger Patties</li>
+                            <li>Maximum variety</li>
+                            <li>Premium cuts throughout</li>
+                            <li>Best price per pound</li>
+                            <li>See full contents on menu</li>
                         </ul>
                         <a href="https://cash.app/order/$3strandsbeef" class="btn btn-primary btn-full" target="_blank" rel="noopener">Order This Bundle</a>
                     </article>
 
                     <article class="bundle-card">
                         <div class="bundle-badge">Premium</div>
-                        <h3>Freezer Filler</h3>
+                        <h3>Family Advantage Bundle</h3>
                         <div class="bundle-price">
-                            <span class="price-amount">$549</span>
-                            <span class="price-detail">~70 lbs</span>
+                            <span class="price-amount">$1,389.99</span>
+                            <span class="price-detail">Ultimate selection</span>
                         </div>
                         <ul class="bundle-contents">
-                            <li>15 lbs Ground Beef</li>
-                            <li>8 Ribeye Steaks</li>
-                            <li>8 NY Strip Steaks</li>
-                            <li>6 Sirloin Steaks</li>
-                            <li>2 Chuck Roasts</li>
-                            <li>1 Prime Rib Roast (5-6 lbs)</li>
-                            <li>4 lbs Stew Meat</li>
-                            <li>3 lbs Short Ribs</li>
-                            <li>Soup Bones (free)</li>
+                            <li>Our most complete bundle</li>
+                            <li>Months of premium beef</li>
+                            <li>Every cut available</li>
+                            <li>See full contents on menu</li>
                         </ul>
                         <a href="https://cash.app/order/$3strandsbeef" class="btn btn-primary btn-full" target="_blank" rel="noopener">Order This Bundle</a>
                     </article>
