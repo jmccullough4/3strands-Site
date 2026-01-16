@@ -49,6 +49,22 @@
                 </div>
                 <button type="submit" class="btn btn-primary btn-full">Start Chat</button>
             </form>
+            <div id="prechat-offline-msg" class="prechat-offline" style="display: none;">
+                <div class="offline-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="48" height="48">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                </div>
+                <h4>We're Currently Offline</h4>
+                <p>Our chat hours are:</p>
+                <ul>
+                    <li><strong>Mon-Sat:</strong> 7am - 9pm ET</li>
+                    <li><strong>Sunday:</strong> 12pm - 4pm ET</li>
+                </ul>
+                <p>Please call us at <a href="tel:+18637993300">(863) 799-3300</a> or send us a message through the contact form below.</p>
+                <a href="#contact" class="btn btn-primary btn-full" onclick="hidePrechatModal();">Go to Contact Form</a>
+            </div>
             <p class="prechat-hours">
                 <strong>Chat Hours:</strong> Mon-Sat 7am-9pm | Sun 12pm-4pm ET<br>
                 <small>We'll email you if we miss your message!</small>
@@ -60,6 +76,7 @@
     <script type="text/javascript">
     var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
     var visitorInfo = {};
+    var tawkLoaded = false;
 
     // Check if within business hours (Eastern Time)
     function isWithinBusinessHours() {
@@ -75,50 +92,30 @@
         // M-Sat: 7am-9pm (420-1260 minutes), Sun: 12pm-4pm (720-960 minutes)
         if (day === 'Sun') {
             return currentMinutes >= 720 && currentMinutes < 960;
+        } else if (day === 'Sat') {
+            return currentMinutes >= 420 && currentMinutes < 1260;
         } else {
+            // Mon-Fri
             return currentMinutes >= 420 && currentMinutes < 1260;
         }
     }
 
-    // Customize widget appearance - cleaner, more modern look
-    Tawk_API.customStyle = {
-        visibility: {
-            desktop: {
-                position: 'br',
-                xOffset: 20,
-                yOffset: 20
-            },
-            mobile: {
-                position: 'br',
-                xOffset: 10,
-                yOffset: 10
-            }
-        },
-        zIndex: 1000
-    };
-
-    // Hide widget by default - we'll show pre-chat form first
+    // When Tawk loads, hide widget by default
     Tawk_API.onLoad = function() {
-        Tawk_API.hideWidget();
-        if (!isWithinBusinessHours()) {
-            Tawk_API.setAttributes({
-                'status': 'offline'
-            });
-        }
-    };
-
-    // Hide widget when chat is minimized - force users through pre-chat form
-    Tawk_API.onChatMinimized = function() {
-        Tawk_API.hideWidget();
-    };
-
-    // Hide widget when chat ends
-    Tawk_API.onChatEnded = function() {
+        tawkLoaded = true;
         Tawk_API.hideWidget();
     };
 
     // Show pre-chat modal
     function showPrechatModal() {
+        // Check business hours first
+        if (!isWithinBusinessHours()) {
+            document.getElementById('prechat-offline-msg').style.display = 'block';
+            document.getElementById('prechat-form').style.display = 'none';
+        } else {
+            document.getElementById('prechat-offline-msg').style.display = 'none';
+            document.getElementById('prechat-form').style.display = 'flex';
+        }
         document.getElementById('prechat-modal').style.display = 'flex';
         document.body.style.overflow = 'hidden';
     }
@@ -151,37 +148,29 @@
             // Store visitor info
             visitorInfo = { name, email, topic };
 
-            // Set Tawk.to visitor attributes so you can see their info
-            if (typeof Tawk_API !== 'undefined' && Tawk_API.setAttributes) {
+            // Hide modal first
+            hidePrechatModal();
+
+            // Set Tawk.to visitor attributes
+            if (typeof Tawk_API !== 'undefined' && tawkLoaded) {
                 Tawk_API.setAttributes({
                     'name': name,
                     'email': email,
                     'topic': topic
-                }, function(error) {
-                    if (error) console.log('Tawk attribute error:', error);
-                });
-            }
+                }, function(error) {});
 
-            // Also add tags for easy filtering
-            if (typeof Tawk_API !== 'undefined' && Tawk_API.addTags) {
-                Tawk_API.addTags([topic], function(error) {
-                    if (error) console.log('Tawk tag error:', error);
-                });
-            }
+                // Add tags for filtering
+                if (Tawk_API.addTags) {
+                    Tawk_API.addTags([topic], function(error) {});
+                }
 
-            // Hide modal and show/maximize chat
-            hidePrechatModal();
-
-            if (typeof Tawk_API !== 'undefined') {
-                Tawk_API.showWidget();
-                Tawk_API.maximize();
-
-                // Send automatic first message with customer info so team sees it immediately
+                // Show widget and maximize with slight delay for attributes to set
                 setTimeout(function() {
-                    if (Tawk_API.sendMessage) {
-                        Tawk_API.sendMessage('Hi! I\'m ' + name + ' and I have a question about: ' + topic);
-                    }
-                }, 500);
+                    Tawk_API.showWidget();
+                    setTimeout(function() {
+                        Tawk_API.maximize();
+                    }, 300);
+                }, 200);
             }
 
             // Clear form for next time

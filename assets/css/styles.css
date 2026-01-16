@@ -1687,6 +1687,46 @@ main,
     color: var(--color-gray-400);
 }
 
+/* Offline Message */
+.prechat-offline {
+    text-align: center;
+    padding: var(--space-lg) 0;
+}
+
+.prechat-offline .offline-icon {
+    color: var(--color-gray-400);
+    margin-bottom: var(--space-lg);
+}
+
+.prechat-offline h4 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    color: var(--color-gray-800);
+    margin-bottom: var(--space-md);
+}
+
+.prechat-offline p {
+    color: var(--color-gray-600);
+    font-size: 0.9375rem;
+    margin-bottom: var(--space-sm);
+}
+
+.prechat-offline ul {
+    list-style: none;
+    margin-bottom: var(--space-lg);
+}
+
+.prechat-offline ul li {
+    color: var(--color-gray-600);
+    font-size: 0.9375rem;
+    padding: var(--space-xs) 0;
+}
+
+.prechat-offline a:not(.btn) {
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
 /* ==========================================================================
    Responsive Design
    ========================================================================== */
