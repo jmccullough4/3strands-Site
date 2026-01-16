@@ -175,6 +175,13 @@
             if (typeof Tawk_API !== 'undefined') {
                 Tawk_API.showWidget();
                 Tawk_API.maximize();
+
+                // Send automatic first message with customer info so team sees it immediately
+                setTimeout(function() {
+                    if (Tawk_API.sendMessage) {
+                        Tawk_API.sendMessage('Hi! I\'m ' + name + ' and I have a question about: ' + topic);
+                    }
+                }, 500);
             }
 
             // Clear form for next time
