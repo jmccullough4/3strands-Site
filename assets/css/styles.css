@@ -1687,6 +1687,164 @@ main,
     color: var(--color-gray-400);
 }
 
+/* Contact Choice Options */
+.contact-choice {
+    text-align: center;
+}
+
+.contact-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+.contact-option {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    background: var(--color-gray-100);
+    border: 2px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-align: left;
+    width: 100%;
+}
+
+.contact-option:hover {
+    border-color: var(--color-primary);
+    background: var(--color-cream);
+}
+
+.contact-option.offline {
+    opacity: 0.7;
+}
+
+.contact-option .option-icon {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-white);
+    border-radius: var(--radius-md);
+    color: var(--color-primary);
+}
+
+.contact-option .option-text {
+    flex: 1;
+}
+
+.contact-option .option-text strong {
+    display: block;
+    font-size: 1rem;
+    color: var(--color-gray-800);
+    margin-bottom: var(--space-xs);
+}
+
+.contact-option .option-text span {
+    font-size: 0.875rem;
+    color: var(--color-gray-500);
+}
+
+.contact-phone {
+    font-size: 0.9375rem;
+    color: var(--color-gray-600);
+    margin: 0;
+}
+
+.contact-phone a {
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
+/* Back Button */
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) 0;
+    margin-bottom: var(--space-md);
+    background: none;
+    border: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-gray-500);
+    cursor: pointer;
+    transition: color var(--transition-fast);
+}
+
+.back-btn:hover {
+    color: var(--color-primary);
+}
+
+/* Textarea in form */
+.prechat-field textarea {
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-family: inherit;
+    color: var(--color-gray-700);
+    background: var(--color-white);
+    resize: vertical;
+    min-height: 100px;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.prechat-field textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(92, 64, 51, 0.1);
+}
+
+.prechat-field textarea::placeholder {
+    color: var(--color-gray-400);
+}
+
+/* Offline Message */
+.prechat-offline {
+    text-align: center;
+    padding: var(--space-lg) 0;
+}
+
+.prechat-offline .offline-icon {
+    color: var(--color-gray-400);
+    margin-bottom: var(--space-lg);
+}
+
+.prechat-offline h4 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    color: var(--color-gray-800);
+    margin-bottom: var(--space-md);
+}
+
+.prechat-offline p {
+    color: var(--color-gray-600);
+    font-size: 0.9375rem;
+    margin-bottom: var(--space-sm);
+}
+
+.prechat-offline ul {
+    list-style: none;
+    margin-bottom: var(--space-lg);
+}
+
+.prechat-offline ul li {
+    color: var(--color-gray-600);
+    font-size: 0.9375rem;
+    padding: var(--space-xs) 0;
+}
+
+.prechat-offline a:not(.btn) {
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
 /* ==========================================================================
    Responsive Design
    ========================================================================== */
