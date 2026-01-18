@@ -382,6 +382,65 @@ main,
     color: var(--color-white) !important;
 }
 
+/* Navigation Chat Button - Highlighted */
+.nav-chat-wrapper {
+    position: relative;
+}
+
+.nav-chat-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%);
+    color: white;
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    padding: var(--space-sm) var(--space-lg);
+    border: none;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.4);
+    transition: all var(--transition-fast);
+}
+
+.nav-chat-btn:hover {
+    background: linear-gradient(135deg, #16A34A 0%, #15803D 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.5);
+}
+
+.chat-star {
+    color: #FCD34D;
+    font-size: 1rem;
+    animation: starPulse 2s ease-in-out infinite;
+}
+
+@keyframes starPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.8; }
+}
+
+.chat-pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.3);
+    animation: chatPulse 2s ease-out infinite;
+    pointer-events: none;
+}
+
+@keyframes chatPulse {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+    100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+}
+
 /* Mobile Navigation Toggle */
 .nav-toggle {
     display: none;
@@ -1934,6 +1993,18 @@ main,
     .nav-cta {
         text-align: center;
         margin-top: var(--space-md);
+    }
+
+    .nav-chat-wrapper {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .nav-chat-btn {
+        width: 100%;
+        justify-content: center;
+        padding: var(--space-md) var(--space-lg);
     }
 
     /* Header brand */
