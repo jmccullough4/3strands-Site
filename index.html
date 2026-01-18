@@ -263,26 +263,64 @@
             // Hide modal first
             hidePrechatModal();
 
-            // Set Tawk.to visitor attributes
-            if (typeof Tawk_API !== 'undefined' && tawkLoaded) {
-                Tawk_API.setAttributes({
-                    'name': name,
-                    'email': email,
-                    'topic': topic
-                }, function(error) {});
-
-                // Add tags for filtering
-                if (Tawk_API.addTags) {
-                    Tawk_API.addTags([topic], function(error) {});
+            // Function to open Tawk chat - only works if tawkLoaded is true
+            function openTawkChat() {
+                if (!tawkLoaded) {
+                    return false;
                 }
 
-                // Show widget and maximize
-                setTimeout(function() {
-                    Tawk_API.showWidget();
+                try {
+                    // Set visitor attributes
+                    if (typeof Tawk_API.setAttributes === 'function') {
+                        Tawk_API.setAttributes({
+                            'name': name,
+                            'email': email,
+                            'topic': topic
+                        }, function(error) {});
+                    }
+
+                    // Add tags for filtering
+                    if (typeof Tawk_API.addTags === 'function') {
+                        Tawk_API.addTags([topic], function(error) {});
+                    }
+
+                    // Show widget first
+                    if (typeof Tawk_API.showWidget === 'function') {
+                        Tawk_API.showWidget();
+                    }
+
+                    // Wait a moment for widget to appear, then maximize
                     setTimeout(function() {
-                        Tawk_API.maximize();
+                        if (typeof Tawk_API.maximize === 'function') {
+                            Tawk_API.maximize();
+                        }
                     }, 300);
-                }, 200);
+
+                    return true;
+                } catch (e) {
+                    console.error('Tawk error:', e);
+                    return false;
+                }
+            }
+
+            // Try to open chat, retry if not loaded yet
+            if (!openTawkChat()) {
+                // Tawk not loaded yet, wait and retry
+                var retryCount = 0;
+                var retryInterval = setInterval(function() {
+                    retryCount++;
+                    if (openTawkChat()) {
+                        clearInterval(retryInterval);
+                    } else if (retryCount >= 20) {
+                        clearInterval(retryInterval);
+                        // Show a helpful message
+                        alert('Live chat is still loading. Please wait a moment, then click the chat icon in the bottom right corner of the screen.');
+                        // Force show the widget anyway
+                        if (typeof Tawk_API !== 'undefined' && typeof Tawk_API.showWidget === 'function') {
+                            Tawk_API.showWidget();
+                        }
+                    }
+                }, 500);
             }
 
             // Clear form for next time
