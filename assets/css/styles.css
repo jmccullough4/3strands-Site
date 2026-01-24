@@ -823,6 +823,14 @@ main,
     margin-left: var(--space-sm);
 }
 
+.bundle-verse {
+    font-size: 0.875rem;
+    font-style: italic;
+    color: var(--color-gray-500);
+    margin-bottom: var(--space-lg);
+    padding-top: var(--space-xs);
+}
+
 .bundle-contents {
     margin-bottom: var(--space-xl);
 }
@@ -977,6 +985,21 @@ main,
     font-size: 0.8125rem;
     color: rgba(255, 255, 255, 0.6);
     margin-bottom: var(--space-xl);
+}
+
+.bulk-delivery-note {
+    font-size: 0.8125rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: var(--space-lg);
+}
+
+.bulk-delivery-note a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: underline;
+}
+
+.bulk-delivery-note a:hover {
+    color: var(--color-white);
 }
 
 .bulk-content .btn {
@@ -1149,6 +1172,21 @@ main,
     font-size: 0.9375rem;
     font-weight: 500;
     color: var(--color-gray-600);
+}
+
+.delivery-note {
+    font-size: 0.8125rem;
+    color: var(--color-gray-500);
+    margin-top: var(--space-lg);
+}
+
+.delivery-note a {
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+
+.delivery-note a:hover {
+    color: var(--color-primary-dark);
 }
 
 /* ==========================================================================
