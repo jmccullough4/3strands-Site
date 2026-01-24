@@ -183,6 +183,16 @@
         Tawk_API.hideWidget();
     };
 
+    // When chat is minimized, hide the widget so user must use our form
+    Tawk_API.onChatMinimized = function() {
+        Tawk_API.hideWidget();
+    };
+
+    // When chat ends, hide the widget
+    Tawk_API.onChatEnded = function() {
+        Tawk_API.hideWidget();
+    };
+
     // Hide all modal views
     function hideAllViews() {
         document.getElementById('contact-choice').style.display = 'none';
@@ -475,10 +485,6 @@
 
                 <div class="product-categories">
                     <div class="category-card">
-                        <div class="category-icon">
-                            <!-- T-Bone Steak Icon -->
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 6c0-1 1-2 3-2 4 0 8 2 12 2 2 0 2 2 1 4s-2 4-4 6c-2 2-4 4-6 4s-4-1-5-3c-1-2-1-4-1-6s0-4 0-5z"/><path d="M9 8v8"/><path d="M6 12h6"/></svg>
-                        </div>
                         <h3>Premium Steaks</h3>
                         <ul class="price-list">
                             <li><span>Filet Mignon</span><span class="price">$35.99</span></li>
@@ -498,10 +504,6 @@
                     </div>
 
                     <div class="category-card">
-                        <div class="category-icon">
-                            <!-- Roast/Large Cut Icon -->
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="12" rx="9" ry="6"/><path d="M3 12c0 3.5 4 6 9 6s9-2.5 9-6"/><path d="M7 9c1-1 3-1.5 5-1.5s4 .5 5 1.5"/><path d="M5 14l2-1"/><path d="M17 14l2-1"/></svg>
-                        </div>
                         <h3>Roasts</h3>
                         <ul class="price-list">
                             <li><span>Tri Tip Roast</span><span class="price">$14.99</span></li>
@@ -513,10 +515,6 @@
                     </div>
 
                     <div class="category-card">
-                        <div class="category-icon">
-                            <!-- Ribs/Bone Icon -->
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4c-1 0-2 1-2 2v2c0 1 1 2 2 2"/><path d="M6 10v4c0 1 1 2 2 2h8c1 0 2-1 2-2v-4"/><path d="M18 10c1 0 2-1 2-2V6c0-1-1-2-2-2"/><path d="M8 10v4"/><path d="M12 10v4"/><path d="M16 10v4"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>
-                        </div>
                         <h3>Additional Offerings</h3>
                         <ul class="price-list">
                             <li><span>Oxtails</span><span class="price">$19.99</span></li>
@@ -531,10 +529,6 @@
                     </div>
 
                     <div class="category-card">
-                        <div class="category-icon">
-                            <!-- Organ Meat/Specialty Icon -->
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3c-2 0-4 1-5 3-1 2-1 4 0 6 1 2 2 4 2 6 0 1 1 2 2 2h2c1 0 2-1 2-2 0-2 1-4 2-6 1-2 1-4 0-6-1-2-3-3-5-3z"/><path d="M9 8c0 1 1 2 3 2s3-1 3-2"/><path d="M10 13h4"/></svg>
-                        </div>
                         <h3>Specialty & Offal</h3>
                         <ul class="price-list">
                             <li><span>Beef Heart</span><span class="price">$11.99</span></li>
@@ -546,10 +540,6 @@
                     </div>
 
                     <div class="category-card">
-                        <div class="category-icon">
-                            <!-- Egg Icon -->
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2c-4 0-7 5-7 10 0 4 3 7 7 7s7-3 7-7c0-5-3-10-7-10z"/></svg>
-                        </div>
                         <h3>Farm Fresh Eggs</h3>
                         <ul class="price-list">
                             <li><span>Half Dozen Eggs</span><span class="price sold-out">Sold Out</span></li>
@@ -730,10 +720,10 @@
                         </div>
                         <div class="feature-item">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                            <span>Free delivery included*</span>
+                            <span>Free delivery available**</span>
                         </div>
                     </div>
-                    <p class="bulk-delivery-note">*Free delivery available on orders over $250. Location restrictions may apply — <a href="#contact">contact us</a> for details.</p>
+                    <p class="bulk-delivery-note">**Free delivery available on orders over $250. Location restrictions may apply — <a href="#contact">contact us</a> for details.</p>
                 </div>
             </div>
         </section>
