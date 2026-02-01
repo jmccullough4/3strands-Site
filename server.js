@@ -4,6 +4,11 @@ var express = require('express');
 var cors = require('cors');
 var square = require('square');
 
+// Fix BigInt serialization globally (Square SDK v44 returns BigInt for prices)
+BigInt.prototype.toJSON = function () {
+    return Number(this);
+};
+
 var app = express();
 var PORT = process.env.PORT || 3001;
 
@@ -184,20 +189,50 @@ app.get('/api/health', function (req, res) {
     res.json({ status: 'ok', environment: process.env.SQUARE_ENVIRONMENT });
 });
 
-// Fix BigInt serialization globally (Square SDK v44 returns BigInt for prices)
-BigInt.prototype.toJSON = function () {
-    return Number(this);
-};
-
 // Debug: raw Square response
 app.get('/api/debug-catalog', function (req, res) {
-    squareClient.catalog.list({ types: 'ITEM' }).then(function (response) {
-        var raw = JSON.stringify(response).substring(0, 5000);
-        res.setHeader('Content-Type', 'application/json');
-        res.send(raw);
-    }).catch(function (error) {
-        res.status(500).json({ error: error.message });
-    });
+    try {
+        var result = squareClient.catalog.list({ types: 'ITEM' });
+
+        // Check if it's an async iterator (SDK v44)
+        if (result && typeof result[Symbol.asyncIterator] === 'function') {
+            var allItems = [];
+            var iter = result[Symbol.asyncIterator]();
+            function collectItems() {
+                return iter.next().then(function (step) {
+                    if (step.done) {
+                        res.json({ method: 'asyncIterator', count: allItems.length, sample: allItems.slice(0, 2) });
+                        return;
+                    }
+                    allItems.push(step.value);
+                    return collectItems();
+                });
+            }
+            collectItems().catch(function (error) {
+                res.status(500).json({ error: error.message, method: 'asyncIterator' });
+            });
+        }
+        // Check if it's a promise
+        else if (result && typeof result.then === 'function') {
+            result.then(function (response) {
+                var keys = Object.keys(response || {});
+                res.json({
+                    method: 'promise',
+                    keys: keys,
+                    hasObjects: !!response.objects,
+                    hasData: !!response.data,
+                    objectCount: response.objects ? response.objects.length : 0,
+                    sample: response.objects ? response.objects.slice(0, 1) : null
+                });
+            }).catch(function (error) {
+                res.status(500).json({ error: error.message, method: 'promise' });
+            });
+        } else {
+            res.json({ method: 'unknown', type: typeof result, keys: Object.keys(result || {}) });
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message, method: 'sync-error' });
+    }
 });
 
 app.listen(PORT, function () {
