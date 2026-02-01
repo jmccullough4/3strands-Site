@@ -184,14 +184,15 @@ app.get('/api/health', function (req, res) {
     res.json({ status: 'ok', environment: process.env.SQUARE_ENVIRONMENT });
 });
 
-// Debug: raw Square response (BigInt-safe)
-function bigIntReplacer(key, value) {
-    return typeof value === 'bigint' ? value.toString() : value;
-}
+// Fix BigInt serialization globally (Square SDK v44 returns BigInt for prices)
+BigInt.prototype.toJSON = function () {
+    return Number(this);
+};
 
+// Debug: raw Square response
 app.get('/api/debug-catalog', function (req, res) {
     squareClient.catalog.list({ types: 'ITEM' }).then(function (response) {
-        var raw = JSON.stringify(response, bigIntReplacer).substring(0, 5000);
+        var raw = JSON.stringify(response).substring(0, 5000);
         res.setHeader('Content-Type', 'application/json');
         res.send(raw);
     }).catch(function (error) {
