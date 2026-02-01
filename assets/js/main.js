@@ -313,53 +313,378 @@ document.addEventListener('DOMContentLoaded', () => {
     document.head.appendChild(style);
 
     // =========================================================================
-    // Chat Widget Helper
+    // Event Calendar
     // =========================================================================
-    // Function to open Tawk.to chat widget
-    window.openChat = function() {
-        if (typeof Tawk_API !== 'undefined' && Tawk_API.maximize) {
-            Tawk_API.maximize();
-        }
-    };
+    const EVENTS_KEY = '3strands_events';
+    let currentMonth = new Date().getMonth();
+    let currentYear = new Date().getFullYear();
+    let selectedDate = null;
+    let isAdmin = false;
 
-    // =========================================================================
-    // Business Hours Check for Chat
-    // =========================================================================
-    function updateChatAvailability() {
-        const chatBanner = document.querySelector('.chat-banner');
-        if (!chatBanner) return;
-
-        const now = new Date();
-        const etOptions = { timeZone: 'America/New_York', hour: 'numeric', minute: 'numeric', hour12: false };
-        const etTime = new Intl.DateTimeFormat('en-US', etOptions).format(now);
-        const [hours, minutes] = etTime.split(':').map(Number);
-        const currentMinutes = hours * 60 + minutes;
-
-        const dayOptions = { timeZone: 'America/New_York', weekday: 'short' };
-        const day = new Intl.DateTimeFormat('en-US', dayOptions).format(now);
-
-        let isOpen = false;
-
-        // M-Sat: 7am-9pm (420-1260 minutes), Sun: 12pm-4pm (720-960 minutes)
-        if (day === 'Sun') {
-            isOpen = currentMinutes >= 720 && currentMinutes < 960;
-        } else {
-            isOpen = currentMinutes >= 420 && currentMinutes < 1260;
-        }
-
-        const chatButton = chatBanner.querySelector('.btn-chat');
-        if (chatButton) {
-            if (isOpen) {
-                chatButton.textContent = 'Start Chat';
-                chatButton.style.opacity = '1';
-            } else {
-                chatButton.textContent = 'Leave a Message';
-                chatButton.style.opacity = '0.8';
-            }
-        }
+    function getEvents() {
+        return JSON.parse(localStorage.getItem(EVENTS_KEY) || '[]');
     }
 
-    updateChatAvailability();
-    // Update every minute
-    setInterval(updateChatAvailability, 60000);
+    function saveEvents(events) {
+        localStorage.setItem(EVENTS_KEY, JSON.stringify(events));
+    }
+
+    function generateId() {
+        return Date.now().toString(36) + Math.random().toString(36).slice(2);
+    }
+
+    function formatDate(dateStr) {
+        const d = new Date(dateStr + 'T00:00:00');
+        return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    }
+
+    function formatTime(timeStr) {
+        if (!timeStr) return '';
+        const [h, m] = timeStr.split(':');
+        const hour = parseInt(h);
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        const displayHour = hour % 12 || 12;
+        return displayHour + ':' + m + ' ' + ampm;
+    }
+
+    function renderCalendar() {
+        const monthLabel = document.querySelector('.calendar-month-label');
+        const daysContainer = document.getElementById('calendar-days');
+        if (!monthLabel || !daysContainer) return;
+
+        const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        monthLabel.textContent = monthNames[currentMonth] + ' ' + currentYear;
+
+        const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+        const daysInPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
+
+        const today = new Date();
+        const todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+
+        const events = getEvents();
+        const eventDates = new Set(events.map(function(e) { return e.date; }));
+
+        daysContainer.innerHTML = '';
+
+        // Previous month trailing days
+        for (var i = firstDay - 1; i >= 0; i--) {
+            var dayEl = document.createElement('div');
+            dayEl.className = 'calendar-day other-month';
+            dayEl.textContent = daysInPrevMonth - i;
+            daysContainer.appendChild(dayEl);
+        }
+
+        // Current month days
+        for (var d = 1; d <= daysInMonth; d++) {
+            var dateStr = currentYear + '-' + String(currentMonth + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+            var dayEl = document.createElement('div');
+            dayEl.className = 'calendar-day';
+            dayEl.textContent = d;
+            dayEl.dataset.date = dateStr;
+
+            if (dateStr === todayStr) dayEl.classList.add('today');
+            if (eventDates.has(dateStr)) dayEl.classList.add('has-event');
+            if (dateStr === selectedDate) dayEl.classList.add('selected');
+
+            dayEl.addEventListener('click', function() {
+                var date = this.dataset.date;
+                if (selectedDate === date) {
+                    selectedDate = null;
+                } else {
+                    selectedDate = date;
+                }
+                renderCalendar();
+            });
+
+            daysContainer.appendChild(dayEl);
+        }
+
+        // Next month leading days
+        var totalCells = firstDay + daysInMonth;
+        var remaining = (7 - (totalCells % 7)) % 7;
+        for (var n = 1; n <= remaining; n++) {
+            var dayEl = document.createElement('div');
+            dayEl.className = 'calendar-day other-month';
+            dayEl.textContent = n;
+            daysContainer.appendChild(dayEl);
+        }
+
+        renderEventsList();
+    }
+
+    function renderEventsList() {
+        var container = document.getElementById('events-list');
+        var emptyMsg = document.getElementById('events-empty');
+        if (!container) return;
+
+        var events = getEvents();
+        var filtered;
+
+        if (selectedDate) {
+            filtered = events.filter(function(e) { return e.date === selectedDate; });
+        } else {
+            // Show upcoming events (next 90 days)
+            var today = new Date();
+            today.setHours(0, 0, 0, 0);
+            var futureDate = new Date(today);
+            futureDate.setDate(futureDate.getDate() + 90);
+            filtered = events.filter(function(e) {
+                var d = new Date(e.date + 'T00:00:00');
+                return d >= today && d <= futureDate;
+            });
+            filtered.sort(function(a, b) { return a.date.localeCompare(b.date) || (a.time || '').localeCompare(b.time || ''); });
+        }
+
+        // Clear previous cards but keep empty message
+        var cards = container.querySelectorAll('.event-card');
+        cards.forEach(function(c) { c.remove(); });
+
+        if (filtered.length === 0) {
+            if (emptyMsg) {
+                emptyMsg.style.display = 'block';
+                emptyMsg.textContent = selectedDate ? 'No events on this date.' : 'No upcoming events scheduled. Check back soon!';
+            }
+            return;
+        }
+
+        if (emptyMsg) emptyMsg.style.display = 'none';
+
+        filtered.forEach(function(evt) {
+            var card = document.createElement('div');
+            card.className = 'event-card';
+
+            var timeStr = '';
+            if (evt.time) {
+                timeStr = formatTime(evt.time);
+                if (evt.endTime) timeStr += ' – ' + formatTime(evt.endTime);
+            }
+
+            var metaParts = '<span>📅 ' + formatDate(evt.date) + '</span>';
+            if (timeStr) metaParts += '<span>🕐 ' + timeStr + '</span>';
+            if (evt.location) metaParts += '<span>📍 ' + evt.location + '</span>';
+
+            var adminBtns = '';
+            if (isAdmin) {
+                adminBtns = '<button class="event-admin-btn edit" data-event-id="' + evt.id + '">Edit</button>' +
+                    '<button class="event-admin-btn delete" data-event-id="' + evt.id + '">Delete</button>';
+            }
+
+            card.innerHTML =
+                '<div class="event-card-info">' +
+                    '<h4>' + evt.name + '</h4>' +
+                    '<div class="event-card-meta">' + metaParts + '</div>' +
+                    (evt.description ? '<p class="event-card-description">' + evt.description + '</p>' : '') +
+                '</div>' +
+                '<div class="event-card-actions">' +
+                    '<button class="event-export-btn google" data-event-id="' + evt.id + '">+ Google</button>' +
+                    '<button class="event-export-btn ics" data-event-id="' + evt.id + '">+ Apple/iCal</button>' +
+                    adminBtns +
+                '</div>';
+
+            container.appendChild(card);
+        });
+    }
+
+    // Calendar navigation
+    var calPrev = document.querySelector('.calendar-prev');
+    var calNext = document.querySelector('.calendar-next');
+    if (calPrev) {
+        calPrev.addEventListener('click', function() {
+            currentMonth--;
+            if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+            selectedDate = null;
+            renderCalendar();
+        });
+    }
+    if (calNext) {
+        calNext.addEventListener('click', function() {
+            currentMonth++;
+            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+            selectedDate = null;
+            renderCalendar();
+        });
+    }
+
+    // =========================================================================
+    // Calendar Export Functions
+    // =========================================================================
+    function exportToGoogleCalendar(evt) {
+        var startDate = evt.date.replace(/-/g, '');
+        var startTime = (evt.time || '00:00').replace(':', '') + '00';
+        var endTime = (evt.endTime || evt.time || '01:00').replace(':', '') + '00';
+        var url = 'https://calendar.google.com/calendar/render?action=TEMPLATE' +
+            '&text=' + encodeURIComponent(evt.name) +
+            '&dates=' + startDate + 'T' + startTime + '/' + startDate + 'T' + endTime +
+            '&location=' + encodeURIComponent(evt.location || '') +
+            '&details=' + encodeURIComponent(evt.description || '');
+        window.open(url, '_blank');
+    }
+
+    function exportToICS(evt) {
+        var startDate = evt.date.replace(/-/g, '');
+        var startTime = (evt.time || '00:00').replace(':', '') + '00';
+        var endTime = (evt.endTime || evt.time || '01:00').replace(':', '') + '00';
+        var ics = [
+            'BEGIN:VCALENDAR',
+            'VERSION:2.0',
+            'PRODID:-//3 Strands Cattle Co.//Events//EN',
+            'BEGIN:VEVENT',
+            'DTSTART:' + startDate + 'T' + startTime,
+            'DTEND:' + startDate + 'T' + endTime,
+            'SUMMARY:' + evt.name,
+            'DESCRIPTION:' + (evt.description || ''),
+            'LOCATION:' + (evt.location || ''),
+            'UID:' + evt.id + '@3strands.co',
+            'END:VEVENT',
+            'END:VCALENDAR'
+        ].join('\r\n');
+        var blob = new Blob([ics], { type: 'text/calendar' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = evt.name.replace(/\s+/g, '_') + '.ics';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+
+    // Export button delegation
+    var eventsListEl = document.getElementById('events-list');
+    if (eventsListEl) {
+        eventsListEl.addEventListener('click', function(e) {
+            var btn = e.target.closest('.event-export-btn');
+            if (btn) {
+                var evt = getEvents().find(function(ev) { return ev.id === btn.dataset.eventId; });
+                if (!evt) return;
+                if (btn.classList.contains('google')) exportToGoogleCalendar(evt);
+                if (btn.classList.contains('ics')) exportToICS(evt);
+                return;
+            }
+
+            var adminBtn = e.target.closest('.event-admin-btn');
+            if (adminBtn && isAdmin) {
+                var eventId = adminBtn.dataset.eventId;
+                if (adminBtn.classList.contains('edit')) {
+                    var ev = getEvents().find(function(e) { return e.id === eventId; });
+                    if (!ev) return;
+                    document.getElementById('event-id').value = ev.id;
+                    document.getElementById('event-name').value = ev.name;
+                    document.getElementById('event-date').value = ev.date;
+                    document.getElementById('event-time').value = ev.time || '';
+                    document.getElementById('event-end-time').value = ev.endTime || '';
+                    document.getElementById('event-location').value = ev.location || '';
+                    document.getElementById('event-description').value = ev.description || '';
+                    document.getElementById('event-form-title').textContent = 'Edit Event';
+                    document.getElementById('event-form-modal').style.display = 'flex';
+                }
+                if (adminBtn.classList.contains('delete')) {
+                    if (confirm('Delete this event?')) {
+                        var events = getEvents().filter(function(e) { return e.id !== eventId; });
+                        saveEvents(events);
+                        renderCalendar();
+                    }
+                }
+            }
+        });
+    }
+
+    // =========================================================================
+    // Secret Admin Login (7 clicks on logo)
+    // =========================================================================
+    var logoClickCount = 0;
+    var logoClickTimer = null;
+    var brandLogo = document.querySelector('.brand-logo');
+
+    if (brandLogo) {
+        brandLogo.addEventListener('click', function(e) {
+            logoClickCount++;
+            clearTimeout(logoClickTimer);
+            logoClickTimer = setTimeout(function() { logoClickCount = 0; }, 3000);
+
+            if (logoClickCount >= 7) {
+                e.preventDefault();
+                logoClickCount = 0;
+                document.getElementById('admin-login-modal').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        });
+    }
+
+    // Admin login form
+    var adminLoginForm = document.getElementById('admin-login-form');
+    if (adminLoginForm) {
+        adminLoginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var user = document.getElementById('admin-username').value;
+            var pass = document.getElementById('admin-password').value;
+            if (user === 'admin' && pass === 'Tucker1234!') {
+                isAdmin = true;
+                document.getElementById('admin-login-modal').style.display = 'none';
+                document.body.style.overflow = '';
+                document.getElementById('admin-controls').style.display = 'block';
+                renderCalendar();
+            } else {
+                document.getElementById('admin-login-status').textContent = 'Invalid credentials.';
+            }
+        });
+    }
+
+    // =========================================================================
+    // Admin Event CRUD
+    // =========================================================================
+    var addEventBtn = document.getElementById('add-event-btn');
+    if (addEventBtn) {
+        addEventBtn.addEventListener('click', function() {
+            document.getElementById('event-form').reset();
+            document.getElementById('event-id').value = '';
+            document.getElementById('event-form-title').textContent = 'Add Event';
+            document.getElementById('event-form-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        });
+    }
+
+    var eventForm = document.getElementById('event-form');
+    if (eventForm) {
+        eventForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var events = getEvents();
+            var id = document.getElementById('event-id').value;
+            var eventData = {
+                id: id || generateId(),
+                name: document.getElementById('event-name').value,
+                date: document.getElementById('event-date').value,
+                time: document.getElementById('event-time').value,
+                endTime: document.getElementById('event-end-time').value,
+                location: document.getElementById('event-location').value,
+                description: document.getElementById('event-description').value
+            };
+
+            if (id) {
+                var idx = events.findIndex(function(ev) { return ev.id === id; });
+                if (idx !== -1) events[idx] = eventData;
+            } else {
+                events.push(eventData);
+            }
+
+            saveEvents(events);
+            document.getElementById('event-form-modal').style.display = 'none';
+            document.body.style.overflow = '';
+            renderCalendar();
+        });
+    }
+
+    // =========================================================================
+    // Modal Close Handlers
+    // =========================================================================
+    document.querySelectorAll('.modal-overlay, .modal-close').forEach(function(el) {
+        el.addEventListener('click', function() {
+            var modal = this.closest('.modal');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        });
+    });
+
+    // Initialize calendar
+    renderCalendar();
 });
