@@ -794,4 +794,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize calendar
     renderCalendar();
+
+    // =========================================================================
+    // Square Catalog Price Sync
+    // =========================================================================
+    var SQUARE_API_URL = window.SQUARE_API_URL || '/api/catalog';
+
+    function formatCents(amount) {
+        return '$' + (amount / 100).toFixed(2);
+    }
+
+    function updatePricesFromSquare() {
+        fetch(SQUARE_API_URL)
+            .then(function(res) {
+                if (!res.ok) throw new Error('API error');
+                return res.json();
+            })
+            .then(function(data) {
+                if (!data.items || !data.items.length) return;
+
+                // Build a name-to-price map (use first variation price)
+                var priceMap = {};
+                data.items.forEach(function(item) {
+                    var name = item.name.trim();
+                    if (item.variations && item.variations.length > 0) {
+                        var v = item.variations[0];
+                        if (v.priceMoney && v.priceMoney.amount) {
+                            priceMap[name.toLowerCase()] = formatCents(v.priceMoney.amount);
+                        }
+                    }
+                });
+
+                // Update all elements with data-square-item attributes
+                document.querySelectorAll('[data-square-item]').forEach(function(el) {
+                    var itemName = el.getAttribute('data-square-item').toLowerCase();
+                    if (priceMap[itemName]) {
+                        var priceEl = el.querySelector('.price');
+                        if (priceEl && !priceEl.classList.contains('sold-out')) {
+                            priceEl.textContent = priceMap[itemName];
+                        }
+                    }
+                });
+
+                console.log('Prices updated from Square catalog (' + Object.keys(priceMap).length + ' items)');
+            })
+            .catch(function(err) {
+                // Silently fail — prices stay as hardcoded defaults
+                console.log('Square catalog fetch skipped:', err.message);
+            });
+    }
+
+    // Fetch prices on page load
+    updatePricesFromSquare();
 });

@@ -1521,6 +1521,12 @@ main,
 .admin-controls {
     margin-top: var(--space-xl);
     text-align: center;
+    padding: var(--space-lg);
+    background: var(--color-cream);
+    border-radius: var(--radius-lg);
+    border: 2px dashed var(--color-accent);
+    position: sticky;
+    bottom: 0;
 }
 
 .admin-login-status {
