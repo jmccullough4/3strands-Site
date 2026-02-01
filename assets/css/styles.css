@@ -1541,6 +1541,78 @@ main,
     bottom: 0;
 }
 
+/* Square API Status */
+.square-status {
+    margin-bottom: var(--space-lg);
+    padding: var(--space-md);
+    background: var(--color-white);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-gray-300);
+    text-align: left;
+}
+
+.square-status-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+    font-size: 0.9375rem;
+}
+
+.square-status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--color-gray-400);
+}
+
+.square-status-dot.checking {
+    background: var(--color-gray-400);
+    animation: pulse 1s infinite;
+}
+
+.square-status-dot.connected {
+    background: #22c55e;
+}
+
+.square-status-dot.warning {
+    background: #f59e0b;
+}
+
+.square-status-dot.error {
+    background: #ef4444;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+.square-status-label {
+    font-weight: 400;
+    color: var(--color-gray-600);
+}
+
+.square-status-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 0.8125rem;
+    color: var(--color-gray-500);
+    margin-bottom: var(--space-sm);
+}
+
+.square-status-warning {
+    color: #f59e0b;
+    font-size: 0.75rem;
+}
+
+.btn-sm {
+    font-size: 0.8125rem;
+    padding: var(--space-xs) var(--space-md);
+}
+
 .admin-login-status {
     margin-top: var(--space-md);
     font-size: 0.875rem;
