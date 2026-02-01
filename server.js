@@ -1,4 +1,5 @@
 require('dotenv').config();
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const { SquareClient, SquareEnvironment } = require('square');
@@ -8,6 +9,11 @@ const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
+
+// Serve static site files from the same directory
+app.use(express.static(path.join(__dirname), {
+    extensions: ['html']
+}));
 
 // Initialize Square client
 const squareClient = new SquareClient({
@@ -33,7 +39,6 @@ app.get('/api/catalog', async (req, res) => {
         const items = [];
         let cursor = undefined;
 
-        // Paginate through all catalog items
         do {
             const response = await squareClient.catalog.list({
                 types: 'ITEM',
@@ -159,6 +164,6 @@ app.get('/api/health', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`3 Strands backend running on port ${PORT}`);
+    console.log(`3 Strands running on http://localhost:${PORT}`);
     console.log(`Square environment: ${process.env.SQUARE_ENVIRONMENT}`);
 });
