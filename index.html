@@ -33,6 +33,7 @@
                     <li><a href="#bundles">Bundles</a></li>
                     <li><a href="#subscriptions">Subscriptions</a></li>
                     <li><a href="#about">About</a></li>
+                    <li><a href="#events">Events</a></li>
                     <li><a href="#contact">Contact</a></li>
                     <li><a href="#order" class="nav-cta">Order Now</a></li>
                 </ul>
@@ -482,6 +483,38 @@
             </div>
         </section>
 
+        <!-- Events / Calendar Section -->
+        <section id="events" class="events" aria-labelledby="events-title">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-label">What's Happening</span>
+                    <h2 id="events-title">Upcoming Events</h2>
+                    <p class="section-description">Join us at farmers markets, tastings, and community events across the Southeast.</p>
+                </div>
+
+                <div class="calendar-nav">
+                    <button type="button" class="btn btn-outline calendar-prev" aria-label="Previous month">&larr;</button>
+                    <h3 class="calendar-month-label"></h3>
+                    <button type="button" class="btn btn-outline calendar-next" aria-label="Next month">&rarr;</button>
+                </div>
+
+                <div class="calendar-grid">
+                    <div class="calendar-header">
+                        <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                    </div>
+                    <div class="calendar-days" id="calendar-days"></div>
+                </div>
+
+                <div class="events-list" id="events-list">
+                    <p class="events-empty" id="events-empty">No upcoming events scheduled. Check back soon!</p>
+                </div>
+
+                <div class="admin-controls" id="admin-controls" style="display:none;">
+                    <button type="button" class="btn btn-primary" id="add-event-btn">+ Add Event</button>
+                </div>
+            </div>
+        </section>
+
         <!-- Newsletter Section -->
         <section class="newsletter" aria-labelledby="newsletter-title">
             <div class="container">
@@ -660,6 +693,7 @@
                         <li><a href="#bundles">Bundles</a></li>
                         <li><a href="#subscriptions">Subscriptions</a></li>
                         <li><a href="#about">About Us</a></li>
+                        <li><a href="#events">Events</a></li>
                         <li><a href="#contact">Contact</a></li>
                     </ul>
                 </div>
@@ -682,6 +716,70 @@
             </div>
         </div>
     </footer>
+
+    <!-- Admin Login Modal -->
+    <div class="modal" id="admin-login-modal" style="display:none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content prechat-content">
+            <button type="button" class="prechat-close modal-close" aria-label="Close">&times;</button>
+            <div class="prechat-header">
+                <h3>Admin Login</h3>
+            </div>
+            <form id="admin-login-form" class="prechat-form">
+                <div class="prechat-field">
+                    <label for="admin-username">Username</label>
+                    <input type="text" id="admin-username" required autocomplete="off">
+                </div>
+                <div class="prechat-field">
+                    <label for="admin-password">Password</label>
+                    <input type="password" id="admin-password" required autocomplete="off">
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Login</button>
+                <p class="admin-login-status" id="admin-login-status"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Event Form Modal (Add / Edit) -->
+    <div class="modal" id="event-form-modal" style="display:none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content prechat-content">
+            <button type="button" class="prechat-close modal-close" aria-label="Close">&times;</button>
+            <div class="prechat-header">
+                <h3 id="event-form-title">Add Event</h3>
+            </div>
+            <form id="event-form" class="prechat-form">
+                <input type="hidden" id="event-id">
+                <div class="prechat-field">
+                    <label for="event-name">Event Name *</label>
+                    <input type="text" id="event-name" required placeholder="e.g. Farmers Market">
+                </div>
+                <div class="prechat-field">
+                    <label for="event-date">Date *</label>
+                    <input type="date" id="event-date" required>
+                </div>
+                <div class="form-row">
+                    <div class="prechat-field">
+                        <label for="event-time">Start Time</label>
+                        <input type="time" id="event-time">
+                    </div>
+                    <div class="prechat-field">
+                        <label for="event-end-time">End Time</label>
+                        <input type="time" id="event-end-time">
+                    </div>
+                </div>
+                <div class="prechat-field">
+                    <label for="event-location">Location</label>
+                    <input type="text" id="event-location" placeholder="e.g. Downtown Lakeland">
+                </div>
+                <div class="prechat-field">
+                    <label for="event-description">Description</label>
+                    <textarea id="event-description" rows="3" placeholder="Tell people what to expect..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Save Event</button>
+            </form>
+        </div>
+    </div>
 
     <script src="assets/js/main.js" defer></script>
 </body>
