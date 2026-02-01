@@ -1,0 +1,15 @@
+{
+  "name": "3strands-site",
+  "version": "1.0.0",
+  "description": "3 Strands Cattle Co. website with Square catalog integration",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "square": "^44.0.0"
+  }
+}
