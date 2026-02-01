@@ -1,11 +1,11 @@
 require('dotenv').config();
-const path = require('path');
-const express = require('express');
-const cors = require('cors');
-const { SquareClient, SquareEnvironment } = require('square');
+var path = require('path');
+var express = require('express');
+var cors = require('cors');
+var square = require('square');
 
-const app = express();
-const PORT = process.env.PORT || 3001;
+var app = express();
+var PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
@@ -16,154 +16,175 @@ app.use(express.static(path.join(__dirname), {
 }));
 
 // Initialize Square client
-const squareClient = new SquareClient({
+var squareClient = new square.SquareClient({
     token: process.env.SQUARE_ACCESS_TOKEN,
     environment: process.env.SQUARE_ENVIRONMENT === 'sandbox'
-        ? SquareEnvironment.Sandbox
-        : SquareEnvironment.Production
+        ? square.SquareEnvironment.Sandbox
+        : square.SquareEnvironment.Production
 });
 
 // Cache catalog data for 5 minutes to reduce API calls
-let catalogCache = null;
-let cacheTimestamp = 0;
-const CACHE_DURATION = 5 * 60 * 1000;
+var catalogCache = null;
+var cacheTimestamp = 0;
+var CACHE_DURATION = 5 * 60 * 1000;
+
+// Helper to safely access nested properties
+function get(obj, path, fallback) {
+    var keys = path.split('.');
+    var current = obj;
+    for (var i = 0; i < keys.length; i++) {
+        if (current == null) return fallback;
+        current = current[keys[i]];
+    }
+    return current != null ? current : fallback;
+}
 
 // GET /api/catalog - Returns all catalog items with prices
-app.get('/api/catalog', async (req, res) => {
-    try {
-        const now = Date.now();
-        if (catalogCache && (now - cacheTimestamp) < CACHE_DURATION) {
-            return res.json(catalogCache);
-        }
+app.get('/api/catalog', function (req, res) {
+    var now = Date.now();
+    if (catalogCache && (now - cacheTimestamp) < CACHE_DURATION) {
+        return res.json(catalogCache);
+    }
 
-        const items = [];
-        let cursor = undefined;
+    var items = [];
+    var cursor;
 
-        do {
-            const response = await squareClient.catalog.list({
-                types: 'ITEM',
-                cursor: cursor
-            });
-
+    function fetchItems(cursor) {
+        return squareClient.catalog.list({
+            types: 'ITEM',
+            cursor: cursor
+        }).then(function (response) {
             if (response.objects) {
-                for (const obj of response.objects) {
-                    const item = {
+                response.objects.forEach(function (obj) {
+                    var itemData = obj.itemData || {};
+                    var item = {
                         id: obj.id,
-                        name: obj.itemData?.name || '',
-                        description: obj.itemData?.description || '',
-                        category: obj.itemData?.categoryId || null,
+                        name: get(itemData, 'name', ''),
+                        description: get(itemData, 'description', ''),
+                        category: get(itemData, 'categoryId', null),
                         variations: []
                     };
 
-                    if (obj.itemData?.variations) {
-                        for (const v of obj.itemData.variations) {
-                            item.variations.push({
-                                id: v.id,
-                                name: v.itemVariationData?.name || '',
-                                priceMoney: v.itemVariationData?.priceMoney ? {
-                                    amount: Number(v.itemVariationData.priceMoney.amount),
-                                    currency: v.itemVariationData.priceMoney.currency
-                                } : null,
-                                pricingType: v.itemVariationData?.pricingType || 'FIXED_PRICING'
-                            });
-                        }
-                    }
+                    var variations = itemData.variations || [];
+                    variations.forEach(function (v) {
+                        var varData = v.itemVariationData || {};
+                        var priceMoney = varData.priceMoney;
+                        item.variations.push({
+                            id: v.id,
+                            name: get(varData, 'name', ''),
+                            priceMoney: priceMoney ? {
+                                amount: Number(priceMoney.amount),
+                                currency: priceMoney.currency
+                            } : null,
+                            pricingType: get(varData, 'pricingType', 'FIXED_PRICING')
+                        });
+                    });
 
                     items.push(item);
-                }
+                });
             }
 
-            cursor = response.cursor;
-        } while (cursor);
-
-        // Fetch categories to include names
-        const categories = {};
-        let catCursor = undefined;
-        do {
-            const catResponse = await squareClient.catalog.list({
-                types: 'CATEGORY',
-                cursor: catCursor
-            });
-
-            if (catResponse.objects) {
-                for (const cat of catResponse.objects) {
-                    categories[cat.id] = cat.categoryData?.name || '';
-                }
+            if (response.cursor) {
+                return fetchItems(response.cursor);
             }
-
-            catCursor = catResponse.cursor;
-        } while (catCursor);
-
-        // Attach category names to items
-        items.forEach(item => {
-            if (item.category && categories[item.category]) {
-                item.categoryName = categories[item.category];
-            }
-        });
-
-        const result = { items, categories, updatedAt: new Date().toISOString() };
-        catalogCache = result;
-        cacheTimestamp = now;
-
-        res.json(result);
-    } catch (error) {
-        console.error('Square API error:', error);
-        res.status(500).json({
-            error: 'Failed to fetch catalog',
-            message: error.message
         });
     }
+
+    function fetchCategories() {
+        var categories = {};
+        function fetchPage(cursor) {
+            return squareClient.catalog.list({
+                types: 'CATEGORY',
+                cursor: cursor
+            }).then(function (catResponse) {
+                if (catResponse.objects) {
+                    catResponse.objects.forEach(function (cat) {
+                        var catData = cat.categoryData || {};
+                        categories[cat.id] = catData.name || '';
+                    });
+                }
+                if (catResponse.cursor) {
+                    return fetchPage(catResponse.cursor);
+                }
+                return categories;
+            });
+        }
+        return fetchPage();
+    }
+
+    fetchItems()
+        .then(function () { return fetchCategories(); })
+        .then(function (categories) {
+            items.forEach(function (item) {
+                if (item.category && categories[item.category]) {
+                    item.categoryName = categories[item.category];
+                }
+            });
+
+            var result = { items: items, categories: categories, updatedAt: new Date().toISOString() };
+            catalogCache = result;
+            cacheTimestamp = now;
+
+            res.json(result);
+        })
+        .catch(function (error) {
+            console.error('Square API error:', error);
+            res.status(500).json({
+                error: 'Failed to fetch catalog',
+                message: error.message
+            });
+        });
 });
 
 // GET /api/catalog/:itemId - Returns a single catalog item
-app.get('/api/catalog/:itemId', async (req, res) => {
-    try {
-        const response = await squareClient.catalog.object.get({
-            objectId: req.params.itemId
-        });
-
+app.get('/api/catalog/:itemId', function (req, res) {
+    squareClient.catalog.object.get({
+        objectId: req.params.itemId
+    }).then(function (response) {
         if (!response.object) {
             return res.status(404).json({ error: 'Item not found' });
         }
 
-        const obj = response.object;
-        const item = {
+        var obj = response.object;
+        var itemData = obj.itemData || {};
+        var item = {
             id: obj.id,
-            name: obj.itemData?.name || '',
-            description: obj.itemData?.description || '',
+            name: get(itemData, 'name', ''),
+            description: get(itemData, 'description', ''),
             variations: []
         };
 
-        if (obj.itemData?.variations) {
-            for (const v of obj.itemData.variations) {
-                item.variations.push({
-                    id: v.id,
-                    name: v.itemVariationData?.name || '',
-                    priceMoney: v.itemVariationData?.priceMoney ? {
-                        amount: Number(v.itemVariationData.priceMoney.amount),
-                        currency: v.itemVariationData.priceMoney.currency
-                    } : null,
-                    pricingType: v.itemVariationData?.pricingType || 'FIXED_PRICING'
-                });
-            }
-        }
+        var variations = itemData.variations || [];
+        variations.forEach(function (v) {
+            var varData = v.itemVariationData || {};
+            var priceMoney = varData.priceMoney;
+            item.variations.push({
+                id: v.id,
+                name: get(varData, 'name', ''),
+                priceMoney: priceMoney ? {
+                    amount: Number(priceMoney.amount),
+                    currency: priceMoney.currency
+                } : null,
+                pricingType: get(varData, 'pricingType', 'FIXED_PRICING')
+            });
+        });
 
         res.json(item);
-    } catch (error) {
+    }).catch(function (error) {
         console.error('Square API error:', error);
         res.status(500).json({
             error: 'Failed to fetch item',
             message: error.message
         });
-    }
+    });
 });
 
 // Health check
-app.get('/api/health', (req, res) => {
+app.get('/api/health', function (req, res) {
     res.json({ status: 'ok', environment: process.env.SQUARE_ENVIRONMENT });
 });
 
-app.listen(PORT, () => {
-    console.log(`3 Strands running on http://localhost:${PORT}`);
-    console.log(`Square environment: ${process.env.SQUARE_ENVIRONMENT}`);
+app.listen(PORT, function () {
+    console.log('3 Strands running on http://localhost:' + PORT);
+    console.log('Square environment: ' + process.env.SQUARE_ENVIRONMENT);
 });
