@@ -184,17 +184,16 @@ app.get('/api/health', function (req, res) {
     res.json({ status: 'ok', environment: process.env.SQUARE_ENVIRONMENT });
 });
 
-// Debug: raw Square response
+// Debug: raw Square response (BigInt-safe)
+function bigIntReplacer(key, value) {
+    return typeof value === 'bigint' ? value.toString() : value;
+}
+
 app.get('/api/debug-catalog', function (req, res) {
     squareClient.catalog.list({ types: 'ITEM' }).then(function (response) {
-        res.json({
-            type: typeof response,
-            keys: Object.keys(response),
-            hasObjects: !!response.objects,
-            hasData: !!response.data,
-            isArray: Array.isArray(response),
-            raw: JSON.stringify(response).substring(0, 2000)
-        });
+        var raw = JSON.stringify(response, bigIntReplacer).substring(0, 5000);
+        res.setHeader('Content-Type', 'application/json');
+        res.send(raw);
     }).catch(function (error) {
         res.status(500).json({ error: error.message });
     });
