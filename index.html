@@ -776,6 +776,19 @@
                     <label for="event-description">Description</label>
                     <textarea id="event-description" rows="3" placeholder="Tell people what to expect..."></textarea>
                 </div>
+                <div class="prechat-field">
+                    <label for="event-recurrence">Recurrence</label>
+                    <select id="event-recurrence">
+                        <option value="none">One-time event</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="biweekly">Every 2 weeks</option>
+                        <option value="monthly">Monthly</option>
+                    </select>
+                </div>
+                <div class="prechat-field recurrence-end-field" id="recurrence-end-field" style="display:none;">
+                    <label for="event-recurrence-end">Repeat until</label>
+                    <input type="date" id="event-recurrence-end">
+                </div>
                 <button type="submit" class="btn btn-primary btn-full">Save Event</button>
             </form>
         </div>
