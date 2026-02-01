@@ -804,14 +804,36 @@ document.addEventListener('DOMContentLoaded', () => {
         return '$' + (amount / 100).toFixed(2);
     }
 
+    var lastSquareData = null;
+
+    function updateSquareStatus(status, message, details) {
+        var dot = document.getElementById('square-status-dot');
+        var label = document.getElementById('square-status-label');
+        var detailsEl = document.getElementById('square-status-details');
+        if (!dot || !label) return;
+
+        dot.className = 'square-status-dot ' + status;
+        label.textContent = message;
+        if (detailsEl) {
+            detailsEl.innerHTML = details || '';
+        }
+    }
+
     function updatePricesFromSquare() {
+        updateSquareStatus('checking', 'Checking...', '');
+
         fetch(SQUARE_API_URL)
             .then(function(res) {
-                if (!res.ok) throw new Error('API error');
+                if (!res.ok) throw new Error('API returned ' + res.status);
                 return res.json();
             })
             .then(function(data) {
-                if (!data.items || !data.items.length) return;
+                lastSquareData = data;
+
+                if (!data.items || !data.items.length) {
+                    updateSquareStatus('warning', 'Connected — No Items', 'The API responded but returned no catalog items.');
+                    return;
+                }
 
                 // Build a name-to-price map (use first variation price)
                 var priceMap = {};
@@ -826,22 +848,47 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 // Update all elements with data-square-item attributes
+                var matched = 0;
+                var unmatched = [];
                 document.querySelectorAll('[data-square-item]').forEach(function(el) {
                     var itemName = el.getAttribute('data-square-item').toLowerCase();
                     if (priceMap[itemName]) {
                         var priceEl = el.querySelector('.price');
                         if (priceEl && !priceEl.classList.contains('sold-out')) {
                             priceEl.textContent = priceMap[itemName];
+                            matched++;
                         }
+                    } else {
+                        unmatched.push(el.getAttribute('data-square-item'));
                     }
                 });
 
+                var totalSiteItems = document.querySelectorAll('[data-square-item]').length;
+                var details = '<span>' + data.items.length + ' catalog items fetched</span>' +
+                    '<span>' + matched + '/' + totalSiteItems + ' site prices updated</span>';
+                if (data.updatedAt) {
+                    var d = new Date(data.updatedAt);
+                    details += '<span>Last sync: ' + d.toLocaleTimeString() + '</span>';
+                }
+                if (unmatched.length > 0) {
+                    details += '<span class="square-status-warning">Unmatched: ' + unmatched.join(', ') + '</span>';
+                }
+
+                updateSquareStatus('connected', 'Connected', details);
                 console.log('Prices updated from Square catalog (' + Object.keys(priceMap).length + ' items)');
             })
             .catch(function(err) {
-                // Silently fail — prices stay as hardcoded defaults
+                updateSquareStatus('error', 'Offline', '<span>Error: ' + err.message + '</span><span>Prices showing hardcoded defaults.</span>');
                 console.log('Square catalog fetch skipped:', err.message);
             });
+    }
+
+    // Refresh button
+    var refreshBtn = document.getElementById('square-refresh-btn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', function() {
+            updatePricesFromSquare();
+        });
     }
 
     // Fetch prices on page load
