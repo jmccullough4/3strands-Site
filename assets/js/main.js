@@ -573,14 +573,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('event-end-time').value = ev.endTime || '';
                     document.getElementById('event-location').value = ev.location || '';
                     document.getElementById('event-description').value = ev.description || '';
+                    document.getElementById('event-recurrence').value = 'none';
+                    if (recurrenceEndField) recurrenceEndField.style.display = 'none';
                     document.getElementById('event-form-title').textContent = 'Edit Event';
                     document.getElementById('event-form-modal').style.display = 'flex';
                 }
                 if (adminBtn.classList.contains('delete')) {
-                    if (confirm('Delete this event?')) {
-                        var events = getEvents().filter(function(e) { return e.id !== eventId; });
-                        saveEvents(events);
-                        renderCalendar();
+                    var ev = getEvents().find(function(e) { return e.id === eventId; });
+                    var msg = (ev && ev.seriesId) ? 'Delete this event or the entire series?' : 'Delete this event?';
+                    if (ev && ev.seriesId) {
+                        var choice = prompt('This is a recurring event. Type "all" to delete the entire series, or "one" to delete just this one.');
+                        if (choice === 'all') {
+                            var sid = ev.seriesId;
+                            var events = getEvents().filter(function(e) { return e.seriesId !== sid; });
+                            saveEvents(events);
+                            renderCalendar();
+                        } else if (choice === 'one') {
+                            var events = getEvents().filter(function(e) { return e.id !== eventId; });
+                            saveEvents(events);
+                            renderCalendar();
+                        }
+                    } else {
+                        if (confirm('Delete this event?')) {
+                            var events = getEvents().filter(function(e) { return e.id !== eventId; });
+                            saveEvents(events);
+                            renderCalendar();
+                        }
                     }
                 }
             }
@@ -635,8 +653,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (user === 'admin' && pass === 'Tucker1234!') {
                 isAdmin = true;
                 document.getElementById('admin-login-modal').style.display = 'none';
-                document.body.style.overflow = '';
                 document.getElementById('admin-controls').style.display = 'block';
+                document.getElementById('calendar-modal').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
                 renderCalendar();
             } else {
                 document.getElementById('admin-login-status').textContent = 'Invalid credentials.';
@@ -647,15 +666,65 @@ document.addEventListener('DOMContentLoaded', () => {
     // =========================================================================
     // Admin Event CRUD
     // =========================================================================
+    // Show/hide recurrence end date field
+    var recurrenceSelect = document.getElementById('event-recurrence');
+    var recurrenceEndField = document.getElementById('recurrence-end-field');
+    if (recurrenceSelect) {
+        recurrenceSelect.addEventListener('change', function() {
+            if (recurrenceEndField) {
+                recurrenceEndField.style.display = this.value === 'none' ? 'none' : 'block';
+            }
+        });
+    }
+
     var addEventBtn = document.getElementById('add-event-btn');
     if (addEventBtn) {
         addEventBtn.addEventListener('click', function() {
             document.getElementById('event-form').reset();
             document.getElementById('event-id').value = '';
             document.getElementById('event-form-title').textContent = 'Add Event';
+            if (recurrenceEndField) recurrenceEndField.style.display = 'none';
             document.getElementById('event-form-modal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
         });
+    }
+
+    function addDays(dateStr, days) {
+        var d = new Date(dateStr + 'T00:00:00');
+        d.setDate(d.getDate() + days);
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+
+    function generateRecurringDates(startDate, recurrence, endDate) {
+        var dates = [startDate];
+        if (recurrence === 'none' || !endDate) return dates;
+
+        var dayInterval = recurrence === 'weekly' ? 7 : recurrence === 'biweekly' ? 14 : 0;
+        var current = startDate;
+
+        if (dayInterval > 0) {
+            while (true) {
+                current = addDays(current, dayInterval);
+                if (current > endDate) break;
+                dates.push(current);
+            }
+        } else if (recurrence === 'monthly') {
+            var start = new Date(startDate + 'T00:00:00');
+            var dayOfMonth = start.getDate();
+            var m = start.getMonth() + 1;
+            var y = start.getFullYear();
+            while (true) {
+                m++;
+                if (m > 12) { m = 1; y++; }
+                var daysInMonth = new Date(y, m, 0).getDate();
+                var day = Math.min(dayOfMonth, daysInMonth);
+                var next = y + '-' + String(m).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+                if (next > endDate) break;
+                dates.push(next);
+            }
+        }
+
+        return dates;
     }
 
     var eventForm = document.getElementById('event-form');
@@ -664,21 +733,43 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             var events = getEvents();
             var id = document.getElementById('event-id').value;
-            var eventData = {
-                id: id || generateId(),
-                name: document.getElementById('event-name').value,
-                date: document.getElementById('event-date').value,
-                time: document.getElementById('event-time').value,
-                endTime: document.getElementById('event-end-time').value,
-                location: document.getElementById('event-location').value,
-                description: document.getElementById('event-description').value
-            };
+            var recurrence = document.getElementById('event-recurrence').value;
+            var recurrenceEnd = document.getElementById('event-recurrence-end').value;
+            var name = document.getElementById('event-name').value;
+            var date = document.getElementById('event-date').value;
+            var time = document.getElementById('event-time').value;
+            var endTime = document.getElementById('event-end-time').value;
+            var location = document.getElementById('event-location').value;
+            var description = document.getElementById('event-description').value;
 
             if (id) {
+                // Editing a single existing event
                 var idx = events.findIndex(function(ev) { return ev.id === id; });
-                if (idx !== -1) events[idx] = eventData;
+                if (idx !== -1) {
+                    events[idx].name = name;
+                    events[idx].date = date;
+                    events[idx].time = time;
+                    events[idx].endTime = endTime;
+                    events[idx].location = location;
+                    events[idx].description = description;
+                }
             } else {
-                events.push(eventData);
+                // New event — generate recurring instances if needed
+                var dates = generateRecurringDates(date, recurrence, recurrenceEnd);
+                var seriesId = dates.length > 1 ? generateId() : null;
+
+                dates.forEach(function(d) {
+                    events.push({
+                        id: generateId(),
+                        seriesId: seriesId,
+                        name: name,
+                        date: d,
+                        time: time,
+                        endTime: endTime,
+                        location: location,
+                        description: description
+                    });
+                });
             }
 
             saveEvents(events);
