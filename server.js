@@ -184,6 +184,22 @@ app.get('/api/health', function (req, res) {
     res.json({ status: 'ok', environment: process.env.SQUARE_ENVIRONMENT });
 });
 
+// Debug: raw Square response
+app.get('/api/debug-catalog', function (req, res) {
+    squareClient.catalog.list({ types: 'ITEM' }).then(function (response) {
+        res.json({
+            type: typeof response,
+            keys: Object.keys(response),
+            hasObjects: !!response.objects,
+            hasData: !!response.data,
+            isArray: Array.isArray(response),
+            raw: JSON.stringify(response).substring(0, 2000)
+        });
+    }).catch(function (error) {
+        res.status(500).json({ error: error.message });
+    });
+});
+
 app.listen(PORT, function () {
     console.log('3 Strands running on http://localhost:' + PORT);
     console.log('Square environment: ' + process.env.SQUARE_ENVIRONMENT);
