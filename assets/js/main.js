@@ -635,8 +635,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (user === 'admin' && pass === 'Tucker1234!') {
                 isAdmin = true;
                 document.getElementById('admin-login-modal').style.display = 'none';
-                document.body.style.overflow = '';
                 document.getElementById('admin-controls').style.display = 'block';
+                document.getElementById('calendar-modal').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
                 renderCalendar();
             } else {
                 document.getElementById('admin-login-status').textContent = 'Invalid credentials.';
