@@ -657,6 +657,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('calendar-modal').style.display = 'flex';
                 document.body.style.overflow = 'hidden';
                 renderCalendar();
+                updatePricesFromSquare();
             } else {
                 document.getElementById('admin-login-status').textContent = 'Invalid credentials.';
             }
