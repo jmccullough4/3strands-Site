@@ -44,6 +44,52 @@ function get(obj, path, fallback) {
     return current != null ? current : fallback;
 }
 
+// Helper to parse a catalog object into our item format
+function parseItem(obj) {
+    var itemData = obj.itemData || {};
+    var item = {
+        id: obj.id,
+        name: get(itemData, 'name', ''),
+        description: get(itemData, 'description', ''),
+        category: get(itemData, 'categoryId', null),
+        variations: []
+    };
+
+    var variations = itemData.variations || [];
+    variations.forEach(function (v) {
+        var varData = v.itemVariationData || {};
+        var priceMoney = varData.priceMoney;
+        item.variations.push({
+            id: v.id,
+            name: get(varData, 'name', ''),
+            priceMoney: priceMoney ? {
+                amount: Number(priceMoney.amount),
+                currency: priceMoney.currency
+            } : null,
+            pricingType: get(varData, 'pricingType', 'FIXED_PRICING')
+        });
+    });
+
+    return item;
+}
+
+// Fetch all pages from a Square catalog.list call
+function fetchAllPages(params) {
+    var allObjects = [];
+
+    function fetchPage(response) {
+        var objects = response.data || [];
+        allObjects = allObjects.concat(objects);
+
+        if (response._hasNextPage && typeof response.loadNextPage === 'function') {
+            return response.loadNextPage().then(fetchPage);
+        }
+        return allObjects;
+    }
+
+    return squareClient.catalog.list(params).then(fetchPage);
+}
+
 // GET /api/catalog - Returns all catalog items with prices
 app.get('/api/catalog', function (req, res) {
     var now = Date.now();
@@ -51,75 +97,25 @@ app.get('/api/catalog', function (req, res) {
         return res.json(catalogCache);
     }
 
-    var items = [];
-    var cursor;
+    var itemsPromise = fetchAllPages({ types: 'ITEM' });
+    var categoriesPromise = fetchAllPages({ types: 'CATEGORY' });
 
-    function fetchItems(cursor) {
-        return squareClient.catalog.list({
-            types: 'ITEM',
-            cursor: cursor
-        }).then(function (response) {
-            if (response.objects) {
-                response.objects.forEach(function (obj) {
-                    var itemData = obj.itemData || {};
-                    var item = {
-                        id: obj.id,
-                        name: get(itemData, 'name', ''),
-                        description: get(itemData, 'description', ''),
-                        category: get(itemData, 'categoryId', null),
-                        variations: []
-                    };
+    Promise.all([itemsPromise, categoriesPromise])
+        .then(function (results) {
+            var rawItems = results[0];
+            var rawCategories = results[1];
 
-                    var variations = itemData.variations || [];
-                    variations.forEach(function (v) {
-                        var varData = v.itemVariationData || {};
-                        var priceMoney = varData.priceMoney;
-                        item.variations.push({
-                            id: v.id,
-                            name: get(varData, 'name', ''),
-                            priceMoney: priceMoney ? {
-                                amount: Number(priceMoney.amount),
-                                currency: priceMoney.currency
-                            } : null,
-                            pricingType: get(varData, 'pricingType', 'FIXED_PRICING')
-                        });
-                    });
-
-                    items.push(item);
-                });
-            }
-
-            if (response.cursor) {
-                return fetchItems(response.cursor);
-            }
-        });
-    }
-
-    function fetchCategories() {
-        var categories = {};
-        function fetchPage(cursor) {
-            return squareClient.catalog.list({
-                types: 'CATEGORY',
-                cursor: cursor
-            }).then(function (catResponse) {
-                if (catResponse.objects) {
-                    catResponse.objects.forEach(function (cat) {
-                        var catData = cat.categoryData || {};
-                        categories[cat.id] = catData.name || '';
-                    });
-                }
-                if (catResponse.cursor) {
-                    return fetchPage(catResponse.cursor);
-                }
-                return categories;
+            // Build categories map
+            var categories = {};
+            rawCategories.forEach(function (cat) {
+                var catData = cat.categoryData || {};
+                categories[cat.id] = catData.name || '';
             });
-        }
-        return fetchPage();
-    }
 
-    fetchItems()
-        .then(function () { return fetchCategories(); })
-        .then(function (categories) {
+            // Parse items
+            var items = rawItems.map(parseItem);
+
+            // Attach category names
             items.forEach(function (item) {
                 if (item.category && categories[item.category]) {
                     item.categoryName = categories[item.category];
@@ -146,35 +142,11 @@ app.get('/api/catalog/:itemId', function (req, res) {
     squareClient.catalog.object.get({
         objectId: req.params.itemId
     }).then(function (response) {
-        if (!response.object) {
+        var obj = response.data || response.object;
+        if (!obj) {
             return res.status(404).json({ error: 'Item not found' });
         }
-
-        var obj = response.object;
-        var itemData = obj.itemData || {};
-        var item = {
-            id: obj.id,
-            name: get(itemData, 'name', ''),
-            description: get(itemData, 'description', ''),
-            variations: []
-        };
-
-        var variations = itemData.variations || [];
-        variations.forEach(function (v) {
-            var varData = v.itemVariationData || {};
-            var priceMoney = varData.priceMoney;
-            item.variations.push({
-                id: v.id,
-                name: get(varData, 'name', ''),
-                priceMoney: priceMoney ? {
-                    amount: Number(priceMoney.amount),
-                    currency: priceMoney.currency
-                } : null,
-                pricingType: get(varData, 'pricingType', 'FIXED_PRICING')
-            });
-        });
-
-        res.json(item);
+        res.json(parseItem(obj));
     }).catch(function (error) {
         console.error('Square API error:', error);
         res.status(500).json({
@@ -187,52 +159,6 @@ app.get('/api/catalog/:itemId', function (req, res) {
 // Health check
 app.get('/api/health', function (req, res) {
     res.json({ status: 'ok', environment: process.env.SQUARE_ENVIRONMENT });
-});
-
-// Debug: raw Square response
-app.get('/api/debug-catalog', function (req, res) {
-    try {
-        var result = squareClient.catalog.list({ types: 'ITEM' });
-
-        // Check if it's an async iterator (SDK v44)
-        if (result && typeof result[Symbol.asyncIterator] === 'function') {
-            var allItems = [];
-            var iter = result[Symbol.asyncIterator]();
-            function collectItems() {
-                return iter.next().then(function (step) {
-                    if (step.done) {
-                        res.json({ method: 'asyncIterator', count: allItems.length, sample: allItems.slice(0, 2) });
-                        return;
-                    }
-                    allItems.push(step.value);
-                    return collectItems();
-                });
-            }
-            collectItems().catch(function (error) {
-                res.status(500).json({ error: error.message, method: 'asyncIterator' });
-            });
-        }
-        // Check if it's a promise
-        else if (result && typeof result.then === 'function') {
-            result.then(function (response) {
-                var keys = Object.keys(response || {});
-                res.json({
-                    method: 'promise',
-                    keys: keys,
-                    hasObjects: !!response.objects,
-                    hasData: !!response.data,
-                    objectCount: response.objects ? response.objects.length : 0,
-                    sample: response.objects ? response.objects.slice(0, 1) : null
-                });
-            }).catch(function (error) {
-                res.status(500).json({ error: error.message, method: 'promise' });
-            });
-        } else {
-            res.json({ method: 'unknown', type: typeof result, keys: Object.keys(result || {}) });
-        }
-    } catch (error) {
-        res.status(500).json({ error: error.message, method: 'sync-error' });
-    }
 });
 
 app.listen(PORT, function () {
