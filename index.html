@@ -33,8 +33,8 @@
                     <li><a href="#bundles">Bundles</a></li>
                     <li><a href="#subscriptions">Subscriptions</a></li>
                     <li><a href="#about">About</a></li>
-                    <li><a href="#events">Events</a></li>
                     <li><a href="#contact">Contact</a></li>
+                    <li><button type="button" class="nav-calendar-btn" id="open-calendar-btn">Calendar</button></li>
                     <li><a href="#order" class="nav-cta">Order Now</a></li>
                 </ul>
             </nav>
@@ -483,38 +483,6 @@
             </div>
         </section>
 
-        <!-- Events / Calendar Section -->
-        <section id="events" class="events" aria-labelledby="events-title">
-            <div class="container">
-                <div class="section-header">
-                    <span class="section-label">What's Happening</span>
-                    <h2 id="events-title">Upcoming Events</h2>
-                    <p class="section-description">Join us at farmers markets, tastings, and community events across the Southeast.</p>
-                </div>
-
-                <div class="calendar-nav">
-                    <button type="button" class="btn btn-outline calendar-prev" aria-label="Previous month">&larr;</button>
-                    <h3 class="calendar-month-label"></h3>
-                    <button type="button" class="btn btn-outline calendar-next" aria-label="Next month">&rarr;</button>
-                </div>
-
-                <div class="calendar-grid">
-                    <div class="calendar-header">
-                        <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
-                    </div>
-                    <div class="calendar-days" id="calendar-days"></div>
-                </div>
-
-                <div class="events-list" id="events-list">
-                    <p class="events-empty" id="events-empty">No upcoming events scheduled. Check back soon!</p>
-                </div>
-
-                <div class="admin-controls" id="admin-controls" style="display:none;">
-                    <button type="button" class="btn btn-primary" id="add-event-btn">+ Add Event</button>
-                </div>
-            </div>
-        </section>
-
         <!-- Newsletter Section -->
         <section class="newsletter" aria-labelledby="newsletter-title">
             <div class="container">
@@ -693,7 +661,6 @@
                         <li><a href="#bundles">Bundles</a></li>
                         <li><a href="#subscriptions">Subscriptions</a></li>
                         <li><a href="#about">About Us</a></li>
-                        <li><a href="#events">Events</a></li>
                         <li><a href="#contact">Contact</a></li>
                     </ul>
                 </div>
@@ -716,6 +683,39 @@
             </div>
         </div>
     </footer>
+
+    <!-- Calendar Modal -->
+    <div class="modal" id="calendar-modal" style="display:none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content calendar-modal-content">
+            <button type="button" class="prechat-close modal-close" aria-label="Close">&times;</button>
+            <div class="calendar-modal-header">
+                <h3>Upcoming Events</h3>
+                <p>Join us at farmers markets, tastings, and community events across the Southeast.</p>
+            </div>
+
+            <div class="calendar-nav">
+                <button type="button" class="btn btn-outline calendar-prev" aria-label="Previous month">&larr;</button>
+                <h3 class="calendar-month-label"></h3>
+                <button type="button" class="btn btn-outline calendar-next" aria-label="Next month">&rarr;</button>
+            </div>
+
+            <div class="calendar-grid">
+                <div class="calendar-header">
+                    <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                </div>
+                <div class="calendar-days" id="calendar-days"></div>
+            </div>
+
+            <div class="events-list" id="events-list">
+                <p class="events-empty" id="events-empty">No upcoming events scheduled. Check back soon!</p>
+            </div>
+
+            <div class="admin-controls" id="admin-controls" style="display:none;">
+                <button type="button" class="btn btn-primary" id="add-event-btn">+ Add Event</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Admin Login Modal -->
     <div class="modal" id="admin-login-modal" style="display:none;">

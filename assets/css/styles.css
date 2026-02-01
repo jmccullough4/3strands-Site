@@ -1249,9 +1249,55 @@ main,
    Events / Calendar Section
    ========================================================================== */
 
-.events {
-    padding: var(--space-4xl) 0;
-    background: var(--color-cream);
+/* Nav Calendar Button */
+.nav-calendar-btn {
+    background: var(--color-accent);
+    color: var(--color-white);
+    border: none;
+    padding: 0.5rem 1.25rem;
+    border-radius: var(--radius-full);
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--transition-fast), transform var(--transition-fast);
+    white-space: nowrap;
+}
+
+.nav-calendar-btn:hover {
+    background: var(--color-accent-light);
+    transform: translateY(-1px);
+}
+
+/* Calendar Modal */
+.calendar-modal-content {
+    background: var(--color-white);
+    border-radius: var(--radius-xl);
+    padding: var(--space-2xl);
+    max-width: 700px;
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    animation: modalSlideIn 0.3s ease;
+}
+
+.calendar-modal-header {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+}
+
+.calendar-modal-header h3 {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    color: var(--color-gray-800);
+    margin: 0 0 var(--space-sm);
+}
+
+.calendar-modal-header p {
+    color: var(--color-gray-500);
+    font-size: 0.9375rem;
+    margin: 0;
 }
 
 /* Calendar Navigation */

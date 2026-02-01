@@ -588,20 +588,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================================
+    // Open Calendar Modal
+    // =========================================================================
+    var openCalendarBtn = document.getElementById('open-calendar-btn');
+    if (openCalendarBtn) {
+        openCalendarBtn.addEventListener('click', function() {
+            document.getElementById('calendar-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            renderCalendar();
+        });
+    }
+
+    // =========================================================================
     // Secret Admin Login (7 clicks on logo)
     // =========================================================================
     var logoClickCount = 0;
     var logoClickTimer = null;
-    var brandLogo = document.querySelector('.brand-logo');
+    var brandLink = document.querySelector('.brand-link');
 
-    if (brandLogo) {
-        brandLogo.addEventListener('click', function(e) {
+    if (brandLink) {
+        brandLink.addEventListener('click', function(e) {
             logoClickCount++;
             clearTimeout(logoClickTimer);
+
+            if (logoClickCount >= 2) {
+                e.preventDefault();
+            }
+
             logoClickTimer = setTimeout(function() { logoClickCount = 0; }, 3000);
 
             if (logoClickCount >= 7) {
-                e.preventDefault();
                 logoClickCount = 0;
                 document.getElementById('admin-login-modal').style.display = 'flex';
                 document.body.style.overflow = 'hidden';
