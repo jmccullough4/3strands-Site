@@ -431,7 +431,7 @@
                     </div>
                     <div class="newsletter-form">
                         <!-- Kit (ConvertKit) Newsletter Form -->
-                        <form action="https://app.kit.com/forms/8977420/subscriptions" method="post" class="kit-form" data-sv-form="8977420" data-uid="c8970b14c5">
+                        <form class="kit-form">
                             <div class="form-row">
                                 <input type="email" name="email_address" placeholder="Enter your email" required>
                                 <button type="submit" class="btn btn-primary">Subscribe</button>
@@ -660,6 +660,7 @@
                     <button type="button" class="btn btn-outline btn-sm" id="square-refresh-btn">Refresh Prices</button>
                 </div>
                 <button type="button" class="btn btn-primary" id="add-event-btn">+ Add Event</button>
+                <button type="button" class="btn btn-secondary" id="open-newsletter-btn">Newsletter</button>
             </div>
         </div>
     </div>
@@ -738,6 +739,48 @@
                 </div>
                 <button type="submit" class="btn btn-primary btn-full">Save Event</button>
             </form>
+        </div>
+    </div>
+
+    <!-- Newsletter Admin Modal -->
+    <div class="modal" id="newsletter-modal" style="display:none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content calendar-modal-content">
+            <button type="button" class="prechat-close modal-close" aria-label="Close">&times;</button>
+            <div class="calendar-modal-header">
+                <h3>Newsletter</h3>
+                <p>Manage subscribers and send branded emails.</p>
+            </div>
+
+            <div class="newsletter-admin-tabs">
+                <button type="button" class="nl-tab nl-tab--active" data-tab="compose">Compose</button>
+                <button type="button" class="nl-tab" data-tab="subscribers">Subscribers</button>
+            </div>
+
+            <!-- Compose Tab -->
+            <div class="nl-panel" id="nl-compose" style="display:block;">
+                <form id="newsletter-form">
+                    <div class="prechat-field">
+                        <label for="nl-subject">Subject</label>
+                        <input type="text" id="nl-subject" required placeholder="e.g. Fresh Cuts Available This Week">
+                    </div>
+                    <div class="prechat-field">
+                        <label for="nl-body">Body (HTML supported)</label>
+                        <textarea id="nl-body" rows="10" required placeholder="Write your newsletter content here...&#10;&#10;Use <p>, <h2>, <strong>, <a href=''> for formatting."></textarea>
+                    </div>
+                    <div class="nl-actions">
+                        <button type="button" class="btn btn-outline" id="nl-preview-btn">Preview</button>
+                        <button type="submit" class="btn btn-primary" id="nl-send-btn">Send to All Subscribers</button>
+                    </div>
+                    <p class="nl-status" id="nl-status"></p>
+                </form>
+            </div>
+
+            <!-- Subscribers Tab -->
+            <div class="nl-panel" id="nl-subscribers" style="display:none;">
+                <div class="nl-subscriber-count" id="nl-subscriber-count"></div>
+                <div class="nl-subscriber-list" id="nl-subscriber-list"></div>
+            </div>
         </div>
     </div>
 

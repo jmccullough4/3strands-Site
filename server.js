@@ -1,21 +1,88 @@
 require('dotenv').config();
 var path = require('path');
 var fs = require('fs');
+var crypto = require('crypto');
 var express = require('express');
 var cors = require('cors');
 var square = require('square');
+var nodemailer = require('nodemailer');
 
-// Events persistence file
-var EVENTS_FILE = path.join(__dirname, 'data', 'events.json');
+// Data persistence files
+var DATA_DIR = path.join(__dirname, 'data');
+var EVENTS_FILE = path.join(DATA_DIR, 'events.json');
+var SUBSCRIBERS_FILE = path.join(DATA_DIR, 'subscribers.json');
 
 // Ensure data directory exists
-if (!fs.existsSync(path.join(__dirname, 'data'))) {
-    fs.mkdirSync(path.join(__dirname, 'data'));
+if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR);
 }
 
-// Initialize events file if it doesn't exist
+// Initialize data files if they don't exist
 if (!fs.existsSync(EVENTS_FILE)) {
     fs.writeFileSync(EVENTS_FILE, '[]');
+}
+if (!fs.existsSync(SUBSCRIBERS_FILE)) {
+    fs.writeFileSync(SUBSCRIBERS_FILE, '[]');
+}
+
+// =========================================================================
+// Subscriber helpers
+// =========================================================================
+function readSubscribers() {
+    try {
+        return JSON.parse(fs.readFileSync(SUBSCRIBERS_FILE, 'utf8'));
+    } catch (e) {
+        return [];
+    }
+}
+
+function writeSubscribers(subs) {
+    fs.writeFileSync(SUBSCRIBERS_FILE, JSON.stringify(subs, null, 2));
+}
+
+// =========================================================================
+// Email transporter (configured via .env)
+// =========================================================================
+var mailTransporter = null;
+if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+    mailTransporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: parseInt(process.env.SMTP_PORT || '587', 10),
+        secure: process.env.SMTP_SECURE === 'true',
+        auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS
+        }
+    });
+    console.log('Mail configured: ' + process.env.SMTP_HOST);
+} else {
+    console.log('Mail not configured — set SMTP_HOST, SMTP_USER, SMTP_PASS in .env');
+}
+
+// Branded HTML email template
+function buildEmailHtml(subject, bodyHtml, unsubscribeUrl) {
+    return '<!DOCTYPE html>' +
+    '<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>' +
+    '<body style="margin:0;padding:0;background-color:#F5F0E1;font-family:Inter,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;">' +
+    '<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#F5F0E1;padding:40px 20px;">' +
+    '<tr><td align="center">' +
+    '<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">' +
+    // Header
+    '<tr><td style="background:linear-gradient(145deg,#1F1810,#3D2B22,#2E241A);padding:32px 40px;border-radius:12px 12px 0 0;text-align:center;">' +
+    '<p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:3px;color:#C9A227;margin:0 0 8px;">3 Strands Cattle Co.</p>' +
+    '<h1 style="font-family:Georgia,serif;font-size:28px;font-weight:700;color:#F5F0E1;margin:0;line-height:1.2;">' + subject + '</h1>' +
+    '</td></tr>' +
+    // Body
+    '<tr><td style="background-color:#FFFEF9;padding:40px;border-left:1px solid #D9CDBF;border-right:1px solid #D9CDBF;">' +
+    '<div style="font-size:16px;line-height:1.8;color:#433929;">' + bodyHtml + '</div>' +
+    '</td></tr>' +
+    // Footer
+    '<tr><td style="background-color:#5C4033;padding:24px 40px;border-radius:0 0 12px 12px;text-align:center;">' +
+    '<p style="font-size:13px;color:#D9CDBF;margin:0 0 4px;">Veteran Owned &amp; Faith Driven</p>' +
+    '<p style="font-size:12px;color:#9C8E7C;margin:0;">3 Strands Cattle Co. &bull; Florida</p>' +
+    (unsubscribeUrl ? '<p style="margin:12px 0 0;"><a href="' + unsubscribeUrl + '" style="font-size:11px;color:#9C8E7C;">Unsubscribe</a></p>' : '') +
+    '</td></tr>' +
+    '</table></td></tr></table></body></html>';
 }
 
 // Fix BigInt serialization globally (Square SDK v44 returns BigInt for prices)
@@ -170,43 +237,133 @@ app.get('/api/catalog/:itemId', function (req, res) {
     });
 });
 
-// POST /api/subscribe - Subscribe email to Kit newsletter via v4 API
+// =========================================================================
+// Newsletter API (self-hosted)
+// =========================================================================
+
+// POST /api/subscribe - Add subscriber
 app.post('/api/subscribe', function (req, res) {
     var email = (req.body.email_address || '').trim().toLowerCase();
-    if (!email) {
-        return res.status(400).json({ error: 'Email address is required' });
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(400).json({ error: 'Valid email address is required' });
     }
 
-    var kitApiKey = process.env.KIT_API_KEY;
-    var kitFormId = process.env.KIT_FORM_ID || '8977420';
+    var subs = readSubscribers();
+    var existing = subs.find(function (s) { return s.email === email; });
 
-    if (!kitApiKey) {
-        console.error('KIT_API_KEY not set in environment');
-        return res.status(500).json({ error: 'Newsletter service not configured' });
+    if (existing) {
+        if (existing.status === 'unsubscribed') {
+            existing.status = 'active';
+            existing.resubscribedAt = new Date().toISOString();
+            writeSubscribers(subs);
+            return res.json({ success: true, message: 'Welcome back!' });
+        }
+        return res.json({ success: true, message: 'Already subscribed' });
     }
 
-    // Kit v4 API: add subscriber to form by email
-    fetch('https://api.kit.com/v4/forms/' + kitFormId + '/subscribers', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Kit-Api-Key': kitApiKey
-        },
-        body: JSON.stringify({ email_address: email })
-    })
-    .then(function (kitRes) {
-        return kitRes.json().then(function (data) {
-            if (!kitRes.ok) {
-                console.error('Kit API error:', kitRes.status, data);
-                return res.status(kitRes.status).json({ error: 'Subscription failed', details: data });
-            }
-            res.json({ success: true, subscriber: data.subscriber || data });
-        });
-    })
-    .catch(function (error) {
-        console.error('Kit API request failed:', error);
-        res.status(500).json({ error: 'Failed to reach newsletter service' });
+    subs.push({
+        id: crypto.randomUUID(),
+        email: email,
+        status: 'active',
+        subscribedAt: new Date().toISOString()
     });
+    writeSubscribers(subs);
+    res.json({ success: true, message: 'Subscribed!' });
+});
+
+// GET /api/unsubscribe?id=xxx - Unsubscribe link handler
+app.get('/api/unsubscribe', function (req, res) {
+    var id = req.query.id;
+    if (!id) return res.status(400).send('Missing subscriber ID');
+
+    var subs = readSubscribers();
+    var sub = subs.find(function (s) { return s.id === id; });
+    if (sub) {
+        sub.status = 'unsubscribed';
+        sub.unsubscribedAt = new Date().toISOString();
+        writeSubscribers(subs);
+    }
+
+    res.send('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Unsubscribed</title>' +
+        '<style>body{font-family:Georgia,serif;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#F5F0E1;color:#433929;text-align:center;}' +
+        '.box{max-width:400px;padding:40px;background:#FFFEF9;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.1);}h1{color:#5C4033;margin-bottom:8px;}p{color:#6F6355;}</style></head>' +
+        '<body><div class="box"><h1>Unsubscribed</h1><p>You have been removed from the 3 Strands Cattle Co. mailing list.</p>' +
+        '<p style="margin-top:20px;"><a href="/" style="color:#5C4033;font-weight:600;">Back to site</a></p></div></body></html>');
+});
+
+// GET /api/subscribers - Admin: list subscribers
+app.get('/api/subscribers', function (req, res) {
+    var subs = readSubscribers();
+    res.json(subs);
+});
+
+// DELETE /api/subscribers/:id - Admin: remove subscriber
+app.delete('/api/subscribers/:id', function (req, res) {
+    var subs = readSubscribers();
+    var filtered = subs.filter(function (s) { return s.id !== req.params.id; });
+    writeSubscribers(filtered);
+    res.json({ success: true, remaining: filtered.length });
+});
+
+// POST /api/newsletter/send - Admin: send newsletter to all active subscribers
+app.post('/api/newsletter/send', function (req, res) {
+    if (!mailTransporter) {
+        return res.status(500).json({ error: 'SMTP not configured. Set SMTP_HOST, SMTP_USER, SMTP_PASS in .env' });
+    }
+
+    var subject = (req.body.subject || '').trim();
+    var bodyHtml = (req.body.body || '').trim();
+    var siteUrl = process.env.SITE_URL || ('http://localhost:' + PORT);
+
+    if (!subject || !bodyHtml) {
+        return res.status(400).json({ error: 'Subject and body are required' });
+    }
+
+    var subs = readSubscribers().filter(function (s) { return s.status === 'active'; });
+    if (subs.length === 0) {
+        return res.status(400).json({ error: 'No active subscribers' });
+    }
+
+    var fromAddress = process.env.SMTP_FROM || process.env.SMTP_USER;
+    var sent = 0;
+    var failed = 0;
+    var total = subs.length;
+
+    function sendNext(index) {
+        if (index >= subs.length) {
+            return res.json({ success: true, sent: sent, failed: failed, total: total });
+        }
+
+        var sub = subs[index];
+        var unsubUrl = siteUrl + '/api/unsubscribe?id=' + sub.id;
+        var html = buildEmailHtml(subject, bodyHtml, unsubUrl);
+
+        mailTransporter.sendMail({
+            from: '"3 Strands Cattle Co." <' + fromAddress + '>',
+            to: sub.email,
+            subject: subject,
+            html: html
+        }, function (err) {
+            if (err) {
+                console.error('Failed to send to ' + sub.email + ':', err.message);
+                failed++;
+            } else {
+                sent++;
+            }
+            // Small delay between emails to avoid rate limits
+            setTimeout(function () { sendNext(index + 1); }, 200);
+        });
+    }
+
+    sendNext(0);
+});
+
+// POST /api/newsletter/preview - Admin: preview email HTML
+app.post('/api/newsletter/preview', function (req, res) {
+    var subject = (req.body.subject || 'Preview').trim();
+    var bodyHtml = (req.body.body || '<p>Preview content</p>').trim();
+    var html = buildEmailHtml(subject, bodyHtml, '#');
+    res.send(html);
 });
 
 // Health check
