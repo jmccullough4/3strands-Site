@@ -5,54 +5,10 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     // =========================================================================
-    // Cinematic Intro Sequence
-    // =========================================================================
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const cinema = document.querySelector('.cinema');
-    const cinemaReveal = document.querySelector('.cinema-reveal');
-
-    if (cinema && cinemaReveal && !prefersReducedMotion) {
-        const scenes = cinema.querySelectorAll('.cinema-scene');
-        const dots = cinema.querySelectorAll('.cinema-dot');
-        const SCENE_HOLD = 3200;    // ms each scene is visible
-        const SCENE_FADE = 1200;    // matches CSS transition duration
-        let current = 0;
-
-        function showScene(index) {
-            scenes.forEach(function(s, i) {
-                s.classList.toggle('cinema-scene--active', i === index);
-            });
-            dots.forEach(function(d, i) {
-                d.classList.toggle('cinema-dot--active', i === index);
-            });
-        }
-
-        function nextScene() {
-            current++;
-            if (current < scenes.length) {
-                showScene(current);
-                setTimeout(nextScene, SCENE_HOLD + SCENE_FADE);
-            } else {
-                // All scenes done — fade out cinema, reveal story
-                cinema.classList.add('cinema--done');
-                setTimeout(function() {
-                    cinemaReveal.classList.add('cinema-reveal--visible');
-                }, 600);
-            }
-        }
-
-        // Start the sequence
-        showScene(0);
-        setTimeout(nextScene, SCENE_HOLD + SCENE_FADE);
-    } else if (cinemaReveal) {
-        // Reduced motion or no cinema — show story immediately
-        if (cinema) cinema.style.display = 'none';
-        cinemaReveal.classList.add('cinema-reveal--visible');
-    }
-
-    // =========================================================================
     // Scroll Reveal Animations
     // =========================================================================
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     if (!prefersReducedMotion) {
         const revealObserver = new IntersectionObserver(function(entries) {
             entries.forEach(function(entry) {
