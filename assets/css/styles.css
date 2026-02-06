@@ -332,6 +332,25 @@ main,
     letter-spacing: 0.02em;
 }
 
+/* Rustic American Flag */
+.rustic-flag {
+    flex-shrink: 0;
+    filter: saturate(0.8) contrast(0.95);
+}
+
+.flag-header {
+    width: 36px;
+    height: auto;
+    opacity: 0.85;
+}
+
+.flag-banner {
+    width: 80px;
+    height: auto;
+    opacity: 0.9;
+    margin-bottom: var(--space-lg);
+}
+
 /* Navigation */
 .primary-nav ul {
     display: flex;
@@ -2541,6 +2560,14 @@ main,
         height: 40px;
     }
 
+    .flag-header {
+        width: 28px;
+    }
+
+    .flag-banner {
+        width: 60px;
+    }
+
     /* Hero */
     .hero-actions {
         flex-direction: column;
@@ -2690,6 +2717,14 @@ main,
 
     .brand-link {
         gap: var(--space-sm);
+    }
+
+    .flag-header {
+        width: 24px;
+    }
+
+    .flag-banner {
+        width: 50px;
     }
 
     /* Hero */
