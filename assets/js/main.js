@@ -938,4 +938,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Fetch prices on page load
     updatePricesFromSquare();
+
+    // Smart polling — refresh every 60s while tab is visible, pause when hidden
+    var POLL_INTERVAL = 60 * 1000;
+    var pollTimer = null;
+
+    function startPolling() {
+        if (pollTimer) return;
+        pollTimer = setInterval(updatePricesFromSquare, POLL_INTERVAL);
+    }
+
+    function stopPolling() {
+        if (pollTimer) {
+            clearInterval(pollTimer);
+            pollTimer = null;
+        }
+    }
+
+    startPolling();
+
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            stopPolling();
+        } else {
+            updatePricesFromSquare();
+            startPolling();
+        }
+    });
 });
