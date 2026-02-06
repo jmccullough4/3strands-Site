@@ -1,8 +1,22 @@
 require('dotenv').config();
 var path = require('path');
+var fs = require('fs');
 var express = require('express');
 var cors = require('cors');
 var square = require('square');
+
+// Events persistence file
+var EVENTS_FILE = path.join(__dirname, 'data', 'events.json');
+
+// Ensure data directory exists
+if (!fs.existsSync(path.join(__dirname, 'data'))) {
+    fs.mkdirSync(path.join(__dirname, 'data'));
+}
+
+// Initialize events file if it doesn't exist
+if (!fs.existsSync(EVENTS_FILE)) {
+    fs.writeFileSync(EVENTS_FILE, '[]');
+}
 
 // Fix BigInt serialization globally (Square SDK v44 returns BigInt for prices)
 BigInt.prototype.toJSON = function () {
@@ -159,6 +173,36 @@ app.get('/api/catalog/:itemId', function (req, res) {
 // Health check
 app.get('/api/health', function (req, res) {
     res.json({ status: 'ok', environment: process.env.SQUARE_ENVIRONMENT });
+});
+
+// =========================================================================
+// Calendar Events API
+// =========================================================================
+
+// GET /api/events - Returns all calendar events
+app.get('/api/events', function (req, res) {
+    try {
+        var events = JSON.parse(fs.readFileSync(EVENTS_FILE, 'utf8'));
+        res.json(events);
+    } catch (error) {
+        console.error('Error reading events:', error);
+        res.json([]);
+    }
+});
+
+// POST /api/events - Save all events (replaces entire list)
+app.post('/api/events', function (req, res) {
+    try {
+        var events = req.body;
+        if (!Array.isArray(events)) {
+            return res.status(400).json({ error: 'Events must be an array' });
+        }
+        fs.writeFileSync(EVENTS_FILE, JSON.stringify(events, null, 2));
+        res.json({ success: true, count: events.length });
+    } catch (error) {
+        console.error('Error saving events:', error);
+        res.status(500).json({ error: 'Failed to save events' });
+    }
 });
 
 app.listen(PORT, function () {

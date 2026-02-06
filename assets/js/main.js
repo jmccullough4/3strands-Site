@@ -316,17 +316,50 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event Calendar
     // =========================================================================
     const EVENTS_KEY = '3strands_events';
+    const EVENTS_API_URL = '/api/events';
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
     let selectedDate = null;
     let isAdmin = false;
+    let eventsCache = [];
 
     function getEvents() {
-        return JSON.parse(localStorage.getItem(EVENTS_KEY) || '[]');
+        return eventsCache;
     }
 
     function saveEvents(events) {
+        eventsCache = events;
+        // Save to localStorage as backup
         localStorage.setItem(EVENTS_KEY, JSON.stringify(events));
+        // Save to server for persistence
+        fetch(EVENTS_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(events)
+        }).catch(function(err) {
+            console.error('Failed to save events to server:', err);
+        });
+    }
+
+    // Load events from server on startup
+    function loadEventsFromServer() {
+        fetch(EVENTS_API_URL)
+            .then(function(res) { return res.json(); })
+            .then(function(serverEvents) {
+                if (serverEvents && serverEvents.length > 0) {
+                    eventsCache = serverEvents;
+                    localStorage.setItem(EVENTS_KEY, JSON.stringify(serverEvents));
+                } else {
+                    // Fall back to localStorage if server has no events
+                    eventsCache = JSON.parse(localStorage.getItem(EVENTS_KEY) || '[]');
+                }
+                renderCalendar();
+            })
+            .catch(function(err) {
+                console.error('Failed to load events from server:', err);
+                eventsCache = JSON.parse(localStorage.getItem(EVENTS_KEY) || '[]');
+                renderCalendar();
+            });
     }
 
     function generateId() {
@@ -793,8 +826,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Initialize calendar
-    renderCalendar();
+    // Initialize calendar - load events from server first
+    loadEventsFromServer();
 
     // =========================================================================
     // Square Catalog Price Sync
@@ -850,12 +883,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Update all elements with data-square-item attributes
                 var matched = 0;
+                var soldOut = 0;
                 var unmatched = [];
                 document.querySelectorAll('[data-square-item]').forEach(function(el) {
                     var itemName = el.getAttribute('data-square-item').toLowerCase();
+                    var priceEl = el.querySelector('.price');
+                    var isSoldOut = priceEl && priceEl.classList.contains('sold-out');
+
+                    if (isSoldOut) {
+                        soldOut++;
+                        return; // Skip sold-out items entirely
+                    }
+
                     if (priceMap[itemName]) {
-                        var priceEl = el.querySelector('.price');
-                        if (priceEl && !priceEl.classList.contains('sold-out')) {
+                        if (priceEl) {
                             priceEl.textContent = priceMap[itemName];
                             matched++;
                         }
@@ -864,9 +905,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
 
-                var totalSiteItems = document.querySelectorAll('[data-square-item]').length;
+                var totalSiteItems = document.querySelectorAll('[data-square-item]').length - soldOut;
                 var details = '<span>' + data.items.length + ' catalog items fetched</span>' +
                     '<span>' + matched + '/' + totalSiteItems + ' site prices updated</span>';
+                if (soldOut > 0) {
+                    details += '<span>' + soldOut + ' sold-out items skipped</span>';
+                }
                 if (data.updatedAt) {
                     var d = new Date(data.updatedAt);
                     details += '<span>Last sync: ' + d.toLocaleTimeString() + '</span>';
