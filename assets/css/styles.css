@@ -345,10 +345,11 @@ main,
 }
 
 .flag-banner {
+    display: block;
+    margin: 0 auto var(--space-lg);
     width: 80px;
     height: auto;
     opacity: 0.9;
-    margin-bottom: var(--space-lg);
 }
 
 /* Navigation */
