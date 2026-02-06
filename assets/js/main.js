@@ -5,6 +5,70 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     // =========================================================================
+    // Cinematic Intro Sequence
+    // =========================================================================
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const cinema = document.querySelector('.cinema');
+    const cinemaReveal = document.querySelector('.cinema-reveal');
+
+    if (cinema && cinemaReveal && !prefersReducedMotion) {
+        const scenes = cinema.querySelectorAll('.cinema-scene');
+        const dots = cinema.querySelectorAll('.cinema-dot');
+        const SCENE_HOLD = 3200;    // ms each scene is visible
+        const SCENE_FADE = 1200;    // matches CSS transition duration
+        let current = 0;
+
+        function showScene(index) {
+            scenes.forEach(function(s, i) {
+                s.classList.toggle('cinema-scene--active', i === index);
+            });
+            dots.forEach(function(d, i) {
+                d.classList.toggle('cinema-dot--active', i === index);
+            });
+        }
+
+        function nextScene() {
+            current++;
+            if (current < scenes.length) {
+                showScene(current);
+                setTimeout(nextScene, SCENE_HOLD + SCENE_FADE);
+            } else {
+                // All scenes done — fade out cinema, reveal story
+                cinema.classList.add('cinema--done');
+                setTimeout(function() {
+                    cinemaReveal.classList.add('cinema-reveal--visible');
+                }, 600);
+            }
+        }
+
+        // Start the sequence
+        showScene(0);
+        setTimeout(nextScene, SCENE_HOLD + SCENE_FADE);
+    } else if (cinemaReveal) {
+        // Reduced motion or no cinema — show story immediately
+        if (cinema) cinema.style.display = 'none';
+        cinemaReveal.classList.add('cinema-reveal--visible');
+    }
+
+    // =========================================================================
+    // Scroll Reveal Animations
+    // =========================================================================
+    if (!prefersReducedMotion) {
+        const revealObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-revealed');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+        document.querySelectorAll('.scroll-reveal').forEach(function(el) {
+            revealObserver.observe(el);
+        });
+    }
+
+    // =========================================================================
     // Dynamic Year in Footer
     // =========================================================================
     const yearEl = document.getElementById('year');
@@ -282,35 +346,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================================
-    // Intersection Observer for Fade-in Animations
+    // Intersection Observer for Staggered Card Animations
     // =========================================================================
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
+    if (!prefersReducedMotion) {
+        const cardObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    // Find all sibling cards in the same grid and stagger them
+                    const parent = entry.target.parentElement;
+                    if (parent && !parent.dataset.revealed) {
+                        parent.dataset.revealed = 'true';
+                        const children = parent.querySelectorAll('.bundle-card, .category-card, .mystery-cooler-card, .value-card, .order-option');
+                        children.forEach(function(child, i) {
+                            child.style.transitionDelay = (i * 0.12) + 's';
+                            child.classList.add('is-visible');
+                        });
+                    } else {
+                        entry.target.classList.add('is-visible');
+                    }
+                    cardObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
-    const fadeInObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
-                fadeInObserver.unobserve(entry.target);
-            }
+        const cardStyle = document.createElement('style');
+        cardStyle.textContent = [
+            '.bundle-card, .category-card, .mystery-cooler-card, .value-card, .order-option {',
+            '  opacity: 0; transform: translateY(24px);',
+            '  transition: opacity 0.7s cubic-bezier(0.22,1,0.36,1), transform 0.7s cubic-bezier(0.22,1,0.36,1);',
+            '}',
+            '.bundle-card.is-visible, .category-card.is-visible, .mystery-cooler-card.is-visible, .value-card.is-visible, .order-option.is-visible {',
+            '  opacity: 1; transform: translateY(0);',
+            '}'
+        ].join('\n');
+        document.head.appendChild(cardStyle);
+
+        document.querySelectorAll('.bundle-card, .category-card, .mystery-cooler-card, .value-card, .order-option').forEach(function(el) {
+            cardObserver.observe(el);
         });
-    }, observerOptions);
-
-    // Observe elements for fade-in effect
-    const fadeElements = document.querySelectorAll('.bundle-card, .category-card, .subscription-card, .value-card, .order-option');
-    fadeElements.forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(20px)';
-        el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-        fadeInObserver.observe(el);
-    });
-
-    // Add visible styles
-    const style = document.createElement('style');
-    style.textContent = '.is-visible { opacity: 1 !important; transform: translateY(0) !important; }';
-    document.head.appendChild(style);
+    }
 
     // =========================================================================
     // Event Calendar
