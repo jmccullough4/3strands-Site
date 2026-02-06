@@ -42,10 +42,10 @@ var squareClient = new square.SquareClient({
         : square.SquareEnvironment.Production
 });
 
-// Cache catalog data for 5 minutes to reduce API calls
+// Cache catalog data for 60 seconds — keeps polling near-real-time while limiting API calls
 var catalogCache = null;
 var cacheTimestamp = 0;
-var CACHE_DURATION = 5 * 60 * 1000;
+var CACHE_DURATION = 60 * 1000;
 
 // Helper to safely access nested properties
 function get(obj, path, fallback) {
