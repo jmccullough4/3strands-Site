@@ -516,10 +516,6 @@ main,
 .beef-story {
     position: relative;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
     background: linear-gradient(145deg, var(--color-gray-900) 0%, var(--color-primary-dark) 50%, var(--color-gray-800) 100%);
     overflow: hidden;
 }
@@ -563,10 +559,6 @@ main,
     position: relative;
     z-index: 2;
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
     min-height: 100vh;
     transition: opacity 1s ease;
 }
@@ -575,23 +567,28 @@ main,
     opacity: 0;
     pointer-events: none;
     position: absolute;
+    inset: 0;
 }
 
 .cinema-scene {
     position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) translateY(12px);
+    width: 100%;
+    max-width: 600px;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     padding: 0 var(--space-lg);
     opacity: 0;
-    transform: translateY(12px);
     transition: opacity 1.2s ease, transform 1.2s ease;
 }
 
 .cinema-scene--active {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate(-50%, -50%) translateY(0);
 }
 
 .cinema-icon {
@@ -640,6 +637,8 @@ main,
 .cinema-progress {
     position: absolute;
     bottom: var(--space-3xl);
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     gap: var(--space-md);
 }
@@ -665,6 +664,11 @@ main,
     transform: translateY(30px);
     transition: opacity 1.2s ease 0.3s, transform 1.2s ease 0.3s;
     pointer-events: none;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .cinema-reveal.cinema-reveal--visible {
@@ -787,8 +791,16 @@ main,
     }
 
     .cinema { display: none; }
-    .cinema-reveal { opacity: 1; transform: none; pointer-events: auto; }
+    .cinema-reveal { opacity: 1; transform: none; pointer-events: auto; min-height: auto; }
     .beef-story-scroll { animation: none; }
+}
+
+/* Fallback: if JS never runs, show the story after 20s via animation */
+@keyframes cinema-fallback-reveal {
+    to { opacity: 1; transform: translateY(0); pointer-events: auto; }
+}
+.cinema-reveal {
+    animation: cinema-fallback-reveal 0s ease 20s forwards;
 }
 
 /* ==========================================================================
