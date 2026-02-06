@@ -170,6 +170,45 @@ app.get('/api/catalog/:itemId', function (req, res) {
     });
 });
 
+// POST /api/subscribe - Subscribe email to Kit newsletter via v4 API
+app.post('/api/subscribe', function (req, res) {
+    var email = (req.body.email_address || '').trim().toLowerCase();
+    if (!email) {
+        return res.status(400).json({ error: 'Email address is required' });
+    }
+
+    var kitApiKey = process.env.KIT_API_KEY;
+    var kitFormId = process.env.KIT_FORM_ID || '8977420';
+
+    if (!kitApiKey) {
+        console.error('KIT_API_KEY not set in environment');
+        return res.status(500).json({ error: 'Newsletter service not configured' });
+    }
+
+    // Kit v4 API: add subscriber to form by email
+    fetch('https://api.kit.com/v4/forms/' + kitFormId + '/subscribers', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Kit-Api-Key': kitApiKey
+        },
+        body: JSON.stringify({ email_address: email })
+    })
+    .then(function (kitRes) {
+        return kitRes.json().then(function (data) {
+            if (!kitRes.ok) {
+                console.error('Kit API error:', kitRes.status, data);
+                return res.status(kitRes.status).json({ error: 'Subscription failed', details: data });
+            }
+            res.json({ success: true, subscriber: data.subscriber || data });
+        });
+    })
+    .catch(function (error) {
+        console.error('Kit API request failed:', error);
+        res.status(500).json({ error: 'Failed to reach newsletter service' });
+    });
+});
+
 // Health check
 app.get('/api/health', function (req, res) {
     res.json({ status: 'ok', environment: process.env.SQUARE_ENVIRONMENT });
