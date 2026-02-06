@@ -275,7 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================================
-    // Newsletter Form Handling (Kit)
+    // Newsletter Form Handling (Kit v4 via server)
     // =========================================================================
     const newsletterForm = document.querySelector('.kit-form');
 
@@ -298,16 +298,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                const formData = new FormData(newsletterForm);
-                const response = await fetch(newsletterForm.action, {
+                const response = await fetch('/api/subscribe', {
                     method: 'POST',
-                    body: formData,
-                    headers: {
-                        Accept: 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email_address: emailInput.value })
                 });
 
-                if (response.ok) {
+                const data = await response.json();
+
+                if (response.ok && data.success) {
                     emailInput.value = '';
                     if (formNote) {
                         formNote.textContent = 'Thanks for subscribing!';
@@ -317,7 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         submitButton.textContent = 'Subscribed!';
                     }
                 } else {
-                    throw new Error('Subscription failed');
+                    throw new Error(data.error || 'Subscription failed');
                 }
             } catch (error) {
                 console.error('Newsletter subscription failed:', error);
