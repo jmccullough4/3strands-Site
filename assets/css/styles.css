@@ -543,9 +543,22 @@ main,
 }
 
 .beef-story-text {
-    font-size: clamp(1.05rem, 2vw, 1.3rem);
+    font-size: clamp(1.05rem, 2vw, 1.2rem);
     color: var(--color-sand);
     line-height: 1.8;
+    margin-bottom: var(--space-lg);
+}
+
+.beef-story-text + .beef-story-text {
+    margin-bottom: var(--space-xl);
+}
+
+.beef-story-serving {
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-accent-light);
     margin-bottom: var(--space-2xl);
 }
 
