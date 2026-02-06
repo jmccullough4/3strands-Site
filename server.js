@@ -308,7 +308,7 @@ app.delete('/api/subscribers/:id', function (req, res) {
 // POST /api/newsletter/send - Admin: send newsletter to all active subscribers
 app.post('/api/newsletter/send', function (req, res) {
     if (!mailTransporter) {
-        return res.status(500).json({ error: 'SMTP not configured. Set SMTP_HOST, SMTP_USER, SMTP_PASS in .env' });
+        return res.status(500).json({ error: 'SMTP not configured. Set SMTP_HOST, SMTP_USER, SMTP_PASS in .env and restart the server.' });
     }
 
     var subject = (req.body.subject || '').trim();
@@ -327,11 +327,31 @@ app.post('/api/newsletter/send', function (req, res) {
     var fromAddress = process.env.SMTP_FROM || process.env.SMTP_USER;
     var sent = 0;
     var failed = 0;
+    var errors = [];
     var total = subs.length;
+
+    // Verify SMTP connection before attempting to send
+    mailTransporter.verify(function (verifyErr) {
+        if (verifyErr) {
+            console.error('SMTP verification failed:', verifyErr.message);
+            return res.status(500).json({
+                error: 'SMTP connection failed: ' + verifyErr.message,
+                hint: verifyErr.code === 'EAUTH'
+                    ? 'Check SMTP_USER and SMTP_PASS. For Google Workspace, use an App Password (not your regular password).'
+                    : 'Check SMTP settings in .env and restart the server.'
+            });
+        }
+
+        sendNext(0);
+    });
 
     function sendNext(index) {
         if (index >= subs.length) {
-            return res.json({ success: true, sent: sent, failed: failed, total: total });
+            var result = { success: sent > 0, sent: sent, failed: failed, total: total };
+            if (errors.length > 0) {
+                result.errors = errors;
+            }
+            return res.json(result);
         }
 
         var sub = subs[index];
@@ -343,19 +363,16 @@ app.post('/api/newsletter/send', function (req, res) {
             to: sub.email,
             subject: subject,
             html: html
-        }, function (err) {
-            if (err) {
-                console.error('Failed to send to ' + sub.email + ':', err.message);
-                failed++;
-            } else {
-                sent++;
-            }
-            // Small delay between emails to avoid rate limits
+        }).then(function () {
+            sent++;
+            setTimeout(function () { sendNext(index + 1); }, 200);
+        }).catch(function (err) {
+            console.error('Failed to send to ' + sub.email + ':', err.message);
+            failed++;
+            errors.push(sub.email + ': ' + err.message);
             setTimeout(function () { sendNext(index + 1); }, 200);
         });
     }
-
-    sendNext(0);
 });
 
 // POST /api/newsletter/preview - Admin: preview email HTML
