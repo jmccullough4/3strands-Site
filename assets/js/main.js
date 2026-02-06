@@ -969,8 +969,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data.success) {
                     nlStatus.textContent = 'Sent to ' + data.sent + '/' + data.total + ' subscribers.';
                     nlStatus.style.color = '#22C55E';
+                    if (data.failed > 0 && data.errors) {
+                        nlStatus.textContent += ' (' + data.failed + ' failed: ' + data.errors.join('; ') + ')';
+                        nlStatus.style.color = '#F59E0B';
+                    }
                 } else {
-                    nlStatus.textContent = data.error || 'Send failed.';
+                    var msg = data.error || 'Send failed.';
+                    if (data.hint) msg += ' ' + data.hint;
+                    if (data.errors) msg += ' Details: ' + data.errors.join('; ');
+                    nlStatus.textContent = msg;
                     nlStatus.style.color = '#EF4444';
                 }
                 sendBtn.disabled = false;
