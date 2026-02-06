@@ -859,6 +859,132 @@ document.addEventListener('DOMContentLoaded', () => {
     loadEventsFromServer();
 
     // =========================================================================
+    // Newsletter Admin
+    // =========================================================================
+    var nlModal = document.getElementById('newsletter-modal');
+    var nlOpenBtn = document.getElementById('open-newsletter-btn');
+    var nlTabs = document.querySelectorAll('.nl-tab');
+    var nlCompose = document.getElementById('nl-compose');
+    var nlSubscribers = document.getElementById('nl-subscribers');
+    var nlForm = document.getElementById('newsletter-form');
+    var nlStatus = document.getElementById('nl-status');
+    var nlPreviewBtn = document.getElementById('nl-preview-btn');
+
+    // Open newsletter modal
+    if (nlOpenBtn) {
+        nlOpenBtn.addEventListener('click', function () {
+            nlModal.style.display = 'flex';
+            loadSubscriberList();
+        });
+    }
+
+    // Close newsletter modal
+    if (nlModal) {
+        nlModal.querySelectorAll('.modal-close, .modal-overlay').forEach(function (el) {
+            el.addEventListener('click', function () {
+                nlModal.style.display = 'none';
+            });
+        });
+    }
+
+    // Tab switching
+    nlTabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            var target = this.dataset.tab;
+            nlTabs.forEach(function (t) { t.classList.remove('nl-tab--active'); });
+            this.classList.add('nl-tab--active');
+            nlCompose.style.display = target === 'compose' ? 'block' : 'none';
+            nlSubscribers.style.display = target === 'subscribers' ? 'block' : 'none';
+            if (target === 'subscribers') loadSubscriberList();
+        });
+    });
+
+    // Load subscriber list
+    function loadSubscriberList() {
+        fetch('/api/subscribers').then(function (r) { return r.json(); }).then(function (subs) {
+            var countEl = document.getElementById('nl-subscriber-count');
+            var listEl = document.getElementById('nl-subscriber-list');
+            var active = subs.filter(function (s) { return s.status === 'active'; }).length;
+            countEl.textContent = active + ' active subscriber' + (active !== 1 ? 's' : '') + ' / ' + subs.length + ' total';
+
+            listEl.innerHTML = subs.map(function (s) {
+                var date = new Date(s.subscribedAt).toLocaleDateString();
+                return '<div class="nl-sub-row">' +
+                    '<span class="nl-sub-email">' + s.email + '</span>' +
+                    '<span class="nl-sub-meta">' +
+                    '<span class="nl-sub-status ' + s.status + '">' + s.status + '</span>' +
+                    '<span>' + date + '</span>' +
+                    '<button class="nl-sub-delete" data-id="' + s.id + '" title="Remove">&times;</button>' +
+                    '</span></div>';
+            }).join('');
+
+            // Delete buttons
+            listEl.querySelectorAll('.nl-sub-delete').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var id = this.dataset.id;
+                    fetch('/api/subscribers/' + id, { method: 'DELETE' })
+                        .then(function () { loadSubscriberList(); });
+                });
+            });
+        });
+    }
+
+    // Preview email
+    if (nlPreviewBtn) {
+        nlPreviewBtn.addEventListener('click', function () {
+            var subject = document.getElementById('nl-subject').value || 'Preview';
+            var body = document.getElementById('nl-body').value || '<p>Preview content</p>';
+            fetch('/api/newsletter/preview', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ subject: subject, body: body })
+            }).then(function (r) { return r.text(); }).then(function (html) {
+                var win = window.open('', '_blank', 'width=700,height=800');
+                win.document.write(html);
+                win.document.close();
+            });
+        });
+    }
+
+    // Send newsletter
+    if (nlForm) {
+        nlForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var subject = document.getElementById('nl-subject').value;
+            var body = document.getElementById('nl-body').value;
+            var sendBtn = document.getElementById('nl-send-btn');
+
+            if (!confirm('Send this newsletter to all active subscribers?')) return;
+
+            sendBtn.disabled = true;
+            sendBtn.textContent = 'Sending...';
+            nlStatus.textContent = '';
+            nlStatus.style.color = '';
+
+            fetch('/api/newsletter/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ subject: subject, body: body })
+            }).then(function (r) { return r.json(); }).then(function (data) {
+                if (data.success) {
+                    nlStatus.textContent = 'Sent to ' + data.sent + '/' + data.total + ' subscribers.';
+                    nlStatus.style.color = '#22C55E';
+                } else {
+                    nlStatus.textContent = data.error || 'Send failed.';
+                    nlStatus.style.color = '#EF4444';
+                }
+                sendBtn.disabled = false;
+                sendBtn.textContent = 'Send to All Subscribers';
+            }).catch(function () {
+                nlStatus.textContent = 'Network error. Try again.';
+                nlStatus.style.color = '#EF4444';
+                sendBtn.disabled = false;
+                sendBtn.textContent = 'Send to All Subscribers';
+            });
+        });
+    }
+
+    // =========================================================================
     // Square Catalog Price Sync
     // =========================================================================
     var SQUARE_API_URL = window.SQUARE_API_URL || '/api/catalog';
