@@ -61,14 +61,16 @@ if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
 
 // Branded HTML email template
 function buildEmailHtml(subject, bodyHtml, unsubscribeUrl) {
+    var logoUrl = (process.env.SITE_URL || '') + '/assets/img/logo.png';
     return '<!DOCTYPE html>' +
     '<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>' +
     '<body style="margin:0;padding:0;background-color:#F5F0E1;font-family:Inter,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;">' +
     '<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#F5F0E1;padding:40px 20px;">' +
     '<tr><td align="center">' +
     '<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">' +
-    // Header
+    // Header with logo
     '<tr><td style="background:linear-gradient(145deg,#1F1810,#3D2B22,#2E241A);padding:32px 40px;border-radius:12px 12px 0 0;text-align:center;">' +
+    '<img src="' + logoUrl + '" alt="3 Strands Cattle Co." width="64" height="64" style="display:block;margin:0 auto 16px;border-radius:50%;border:2px solid #C9A227;" />' +
     '<p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:3px;color:#C9A227;margin:0 0 8px;">3 Strands Cattle Co.</p>' +
     '<h1 style="font-family:Georgia,serif;font-size:28px;font-weight:700;color:#F5F0E1;margin:0;line-height:1.2;">' + subject + '</h1>' +
     '</td></tr>' +
