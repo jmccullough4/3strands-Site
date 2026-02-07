@@ -59,6 +59,16 @@ if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
     console.log('Mail not configured — set SMTP_HOST, SMTP_USER, SMTP_PASS in .env');
 }
 
+// Convert plain text (from textarea) to HTML paragraphs
+function textToHtml(text) {
+    // If it already contains HTML tags, return as-is
+    if (/<[a-z][\s\S]*>/i.test(text)) return text;
+    // Split on double newlines for paragraphs, single newlines become <br>
+    return text.split(/\n\s*\n/).map(function (para) {
+        return '<p style="margin:0 0 16px;">' + para.trim().replace(/\n/g, '<br>') + '</p>';
+    }).join('');
+}
+
 // Branded HTML email template
 function buildEmailHtml(subject, bodyHtml, unsubscribeUrl) {
     var logoUrl = (process.env.SITE_URL || '') + '/assets/img/logo.png';
@@ -70,7 +80,7 @@ function buildEmailHtml(subject, bodyHtml, unsubscribeUrl) {
     '<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">' +
     // Header with logo
     '<tr><td style="background:linear-gradient(145deg,#1F1810,#3D2B22,#2E241A);padding:32px 40px;border-radius:12px 12px 0 0;text-align:center;">' +
-    '<img src="' + logoUrl + '" alt="3 Strands Cattle Co." width="64" height="64" style="display:block;margin:0 auto 16px;border-radius:50%;border:2px solid #C9A227;" />' +
+    '<img src="' + logoUrl + '" alt="3 Strands Cattle Co." width="64" height="64" style="display:block;margin:0 auto 16px;" />' +
     '<p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:3px;color:#C9A227;margin:0 0 8px;">3 Strands Cattle Co.</p>' +
     '<h1 style="font-family:Georgia,serif;font-size:28px;font-weight:700;color:#F5F0E1;margin:0;line-height:1.2;">' + subject + '</h1>' +
     '</td></tr>' +
@@ -331,12 +341,14 @@ app.post('/api/newsletter/send', function (req, res) {
     }
 
     var subject = (req.body.subject || '').trim();
-    var bodyHtml = (req.body.body || '').trim();
+    var rawBody = (req.body.body || '').trim();
     var siteUrl = process.env.SITE_URL || ('http://localhost:' + PORT);
 
-    if (!subject || !bodyHtml) {
+    if (!subject || !rawBody) {
         return res.status(400).json({ error: 'Subject and body are required' });
     }
+
+    var bodyHtml = textToHtml(rawBody);
 
     var subs = readSubscribers().filter(function (s) { return s.status === 'active'; });
     if (subs.length === 0) {
@@ -397,7 +409,8 @@ app.post('/api/newsletter/send', function (req, res) {
 // POST /api/newsletter/preview - Admin: preview email HTML
 app.post('/api/newsletter/preview', function (req, res) {
     var subject = (req.body.subject || 'Preview').trim();
-    var bodyHtml = (req.body.body || '<p>Preview content</p>').trim();
+    var rawBody = (req.body.body || 'Preview content').trim();
+    var bodyHtml = textToHtml(rawBody);
     var html = buildEmailHtml(subject, bodyHtml, '#');
     res.send(html);
 });
