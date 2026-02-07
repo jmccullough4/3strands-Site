@@ -271,6 +271,23 @@ app.post('/api/subscribe', function (req, res) {
     });
     writeSubscribers(subs);
     res.json({ success: true, message: 'Subscribed!' });
+
+    // Notify admin of new subscriber
+    if (mailTransporter) {
+        var notifyTo = process.env.SMTP_FROM || process.env.SMTP_USER;
+        var activeCount = subs.filter(function (s) { return s.status === 'active'; }).length;
+        mailTransporter.sendMail({
+            from: '"3 Strands Cattle Co." <' + notifyTo + '>',
+            to: notifyTo,
+            subject: 'New Subscriber: ' + email,
+            html: buildEmailHtml('New Subscriber', '<p style="font-size:18px;font-weight:600;color:#5C4033;">' + email + '</p>' +
+                '<p>Just signed up for the 3 Strands Cattle Co. newsletter.</p>' +
+                '<p style="margin-top:16px;padding:12px 16px;background:#F5F0E1;border-radius:8px;font-size:14px;color:#6F6355;">' +
+                'Total active subscribers: <strong style="color:#5C4033;">' + activeCount + '</strong></p>', null)
+        }).catch(function (err) {
+            console.error('Failed to send new-subscriber notification:', err.message);
+        });
+    }
 });
 
 // GET /api/unsubscribe?id=xxx - Unsubscribe link handler
