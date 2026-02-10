@@ -203,9 +203,8 @@ function fetchInventoryCounts(catalogObjectIds) {
 
     return batches.reduce(function (promiseChain, batch) {
         return promiseChain.then(function () {
-            // Square SDK v44 uses dynamic methods like catalog.list()
-            // For inventory: inventory.batchRetrieveCounts()
-            return squareClient.inventory.batchRetrieveCounts({
+            // Square SDK v44: inventory.batchGetCounts()
+            return squareClient.inventory.batchGetCounts({
                 catalogObjectIds: batch
             }).then(function (response) {
                 // SDK returns data in response.data or response.counts
@@ -229,31 +228,30 @@ function fetchInventoryCounts(catalogObjectIds) {
 
 // Debug endpoint to test inventory API
 app.get('/api/debug/inventory', function (req, res) {
-    // List all properties on squareClient and squareClient.inventory
-    var clientKeys = Object.keys(squareClient);
-    var inventoryKeys = squareClient.inventory ? Object.getOwnPropertyNames(Object.getPrototypeOf(squareClient.inventory)) : [];
+    var testIds = req.query.ids ? req.query.ids.split(',') : [];
 
-    // Also try to get all enumerable and non-enumerable properties
-    var allInventoryProps = [];
-    if (squareClient.inventory) {
-        for (var key in squareClient.inventory) {
-            allInventoryProps.push(key);
-        }
-        // Get prototype methods too
-        var proto = Object.getPrototypeOf(squareClient.inventory);
-        if (proto) {
-            Object.getOwnPropertyNames(proto).forEach(function(k) {
-                if (allInventoryProps.indexOf(k) === -1) allInventoryProps.push(k);
-            });
-        }
+    if (testIds.length === 0) {
+        return res.json({
+            message: 'Inventory API ready. Add ?ids=VARIATION_ID1,VARIATION_ID2 to test.',
+            method: 'batchGetCounts'
+        });
     }
 
-    res.json({
-        squareClientKeys: clientKeys,
-        inventoryExists: !!squareClient.inventory,
-        inventoryPrototypeMethods: inventoryKeys,
-        allInventoryProps: allInventoryProps,
-        inventoryType: squareClient.inventory ? squareClient.inventory.constructor.name : 'N/A'
+    squareClient.inventory.batchGetCounts({
+        catalogObjectIds: testIds
+    }).then(function (response) {
+        var counts = response.data || [];
+        res.json({
+            success: true,
+            requestedIds: testIds,
+            countsReturned: counts.length,
+            counts: counts
+        });
+    }).catch(function (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
     });
 });
 
