@@ -229,36 +229,31 @@ function fetchInventoryCounts(catalogObjectIds) {
 
 // Debug endpoint to test inventory API
 app.get('/api/debug/inventory', function (req, res) {
-    var testIds = req.query.ids ? req.query.ids.split(',') : [];
+    // List all properties on squareClient and squareClient.inventory
+    var clientKeys = Object.keys(squareClient);
+    var inventoryKeys = squareClient.inventory ? Object.getOwnPropertyNames(Object.getPrototypeOf(squareClient.inventory)) : [];
 
-    if (testIds.length === 0) {
-        // Just test the API call with no IDs to see if method exists
-        squareClient.inventory.batchRetrieveCounts({ catalogObjectIds: [] })
-            .then(function(response) {
-                res.json({
-                    success: true,
-                    message: 'Inventory API is working',
-                    response: response
-                });
-            })
-            .catch(function(error) {
-                res.json({
-                    success: false,
-                    error: error.message,
-                    hint: 'Check Square SDK method names'
-                });
+    // Also try to get all enumerable and non-enumerable properties
+    var allInventoryProps = [];
+    if (squareClient.inventory) {
+        for (var key in squareClient.inventory) {
+            allInventoryProps.push(key);
+        }
+        // Get prototype methods too
+        var proto = Object.getPrototypeOf(squareClient.inventory);
+        if (proto) {
+            Object.getOwnPropertyNames(proto).forEach(function(k) {
+                if (allInventoryProps.indexOf(k) === -1) allInventoryProps.push(k);
             });
-        return;
+        }
     }
 
-    fetchInventoryCounts(testIds).then(function (counts) {
-        res.json({
-            requestedIds: testIds,
-            inventoryCounts: counts,
-            countTotal: Object.keys(counts).length
-        });
-    }).catch(function (error) {
-        res.status(500).json({ error: error.message });
+    res.json({
+        squareClientKeys: clientKeys,
+        inventoryExists: !!squareClient.inventory,
+        inventoryPrototypeMethods: inventoryKeys,
+        allInventoryProps: allInventoryProps,
+        inventoryType: squareClient.inventory ? squareClient.inventory.constructor.name : 'N/A'
     });
 });
 
