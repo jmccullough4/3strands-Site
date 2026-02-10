@@ -203,13 +203,29 @@ function fetchInventoryCounts(catalogObjectIds) {
 
     return batches.reduce(function (promiseChain, batch) {
         return promiseChain.then(function () {
-            // Square SDK v44 uses inventory.batchRetrieveInventoryCounts
-            return squareClient.inventory.batchRetrieveInventoryCounts({
+            // Square SDK v44 - try the inventoryApi approach
+            var inventoryApi = squareClient.inventoryApi || squareClient.inventory;
+            if (!inventoryApi) {
+                console.error('No inventory API found on Square client');
+                return;
+            }
+
+            // Try different method names (SDK versions vary)
+            var method = inventoryApi.batchRetrieveInventoryCounts
+                || inventoryApi.batchGetCounts
+                || inventoryApi.retrieveInventoryCount;
+
+            if (!method) {
+                console.error('No batch inventory method found. Available methods:', Object.keys(inventoryApi));
+                return;
+            }
+
+            return method.call(inventoryApi, {
                 catalogObjectIds: batch
             }).then(function (response) {
-                // SDK returns data in response.result or response directly
-                var counts = response.result?.counts || response.counts || [];
-                console.log('Inventory batch returned ' + counts.length + ' counts');
+                // SDK may return data in different places
+                var counts = response.result?.counts || response.counts || response.data?.counts || [];
+                console.log('Inventory batch returned ' + counts.length + ' counts for ' + batch.length + ' items');
                 counts.forEach(function (count) {
                     var qty = parseFloat(count.quantity || '0');
                     var objId = count.catalogObjectId;
@@ -217,7 +233,7 @@ function fetchInventoryCounts(catalogObjectIds) {
                     inventoryCounts[objId] = (inventoryCounts[objId] || 0) + qty;
                 });
             }).catch(function (error) {
-                console.error('Inventory API error for batch:', error.message);
+                console.error('Inventory API error for batch:', error.message, error);
                 // Continue with other batches even if one fails
             });
         });
@@ -226,6 +242,36 @@ function fetchInventoryCounts(catalogObjectIds) {
         return inventoryCounts;
     });
 }
+
+// Debug endpoint to test inventory API
+app.get('/api/debug/inventory', function (req, res) {
+    var testIds = req.query.ids ? req.query.ids.split(',') : [];
+
+    // Show available methods on the inventory API
+    var inventoryApi = squareClient.inventoryApi || squareClient.inventory;
+    var methods = inventoryApi ? Object.keys(inventoryApi).filter(function(k) {
+        return typeof inventoryApi[k] === 'function';
+    }) : [];
+
+    if (testIds.length === 0) {
+        return res.json({
+            inventoryApiExists: !!inventoryApi,
+            availableMethods: methods,
+            usage: 'Add ?ids=ID1,ID2 to test specific catalog object IDs'
+        });
+    }
+
+    fetchInventoryCounts(testIds).then(function (counts) {
+        res.json({
+            inventoryApiExists: !!inventoryApi,
+            availableMethods: methods,
+            requestedIds: testIds,
+            inventoryCounts: counts
+        });
+    }).catch(function (error) {
+        res.status(500).json({ error: error.message });
+    });
+});
 
 // GET /api/catalog - Returns all catalog items with prices and inventory
 app.get('/api/catalog', function (req, res) {
