@@ -126,6 +126,9 @@ var catalogCache = null;
 var cacheTimestamp = 0;
 var CACHE_DURATION = 60 * 1000;
 
+// Low stock threshold (same as iOS app)
+var LOW_STOCK_THRESHOLD = 5;
+
 // Helper to safely access nested properties
 function get(obj, path, fallback) {
     var keys = path.split('.');
@@ -183,7 +186,44 @@ function fetchAllPages(params) {
     return squareClient.catalog.list(params).then(fetchPage);
 }
 
-// GET /api/catalog - Returns all catalog items with prices
+// Fetch inventory counts for a list of catalog object IDs
+function fetchInventoryCounts(catalogObjectIds) {
+    if (!catalogObjectIds || catalogObjectIds.length === 0) {
+        return Promise.resolve({});
+    }
+
+    var inventoryCounts = {};
+    var batchSize = 100; // Square API limit
+
+    // Process in batches
+    var batches = [];
+    for (var i = 0; i < catalogObjectIds.length; i += batchSize) {
+        batches.push(catalogObjectIds.slice(i, i + batchSize));
+    }
+
+    return batches.reduce(function (promiseChain, batch) {
+        return promiseChain.then(function () {
+            return squareClient.inventory.batchGetCounts({
+                catalogObjectIds: batch
+            }).then(function (response) {
+                var counts = response.counts || [];
+                counts.forEach(function (count) {
+                    var qty = parseFloat(count.quantity || '0');
+                    var objId = count.catalogObjectId;
+                    // Sum quantities across locations
+                    inventoryCounts[objId] = (inventoryCounts[objId] || 0) + qty;
+                });
+            }).catch(function (error) {
+                console.error('Inventory API error for batch:', error.message);
+                // Continue with other batches even if one fails
+            });
+        });
+    }, Promise.resolve()).then(function () {
+        return inventoryCounts;
+    });
+}
+
+// GET /api/catalog - Returns all catalog items with prices and inventory
 app.get('/api/catalog', function (req, res) {
     var now = Date.now();
     if (catalogCache && (now - cacheTimestamp) < CACHE_DURATION) {
@@ -208,18 +248,41 @@ app.get('/api/catalog', function (req, res) {
             // Parse items
             var items = rawItems.map(parseItem);
 
-            // Attach category names
+            // Collect all variation IDs for inventory lookup
+            var allVariationIds = [];
             items.forEach(function (item) {
-                if (item.category && categories[item.category]) {
-                    item.categoryName = categories[item.category];
-                }
+                item.variations.forEach(function (v) {
+                    allVariationIds.push(v.id);
+                });
             });
 
-            var result = { items: items, categories: categories, updatedAt: new Date().toISOString() };
-            catalogCache = result;
-            cacheTimestamp = now;
+            // Fetch inventory counts
+            return fetchInventoryCounts(allVariationIds).then(function (inventoryCounts) {
+                // Attach inventory and stock status to items
+                items.forEach(function (item) {
+                    var totalQuantity = 0;
+                    item.variations.forEach(function (v) {
+                        var qty = inventoryCounts[v.id] || 0;
+                        v.quantity = qty;
+                        v.isSoldOut = qty <= 0;
+                        totalQuantity += qty;
+                    });
+                    item.totalQuantity = totalQuantity;
+                    item.isSoldOut = item.variations.every(function (v) { return v.isSoldOut; });
+                    item.isLowStock = totalQuantity > 0 && totalQuantity <= LOW_STOCK_THRESHOLD;
 
-            res.json(result);
+                    // Attach category names
+                    if (item.category && categories[item.category]) {
+                        item.categoryName = categories[item.category];
+                    }
+                });
+
+                var result = { items: items, categories: categories, updatedAt: new Date().toISOString() };
+                catalogCache = result;
+                cacheTimestamp = now;
+
+                res.json(result);
+            });
         })
         .catch(function (error) {
             console.error('Square API error:', error);

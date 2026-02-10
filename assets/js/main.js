@@ -1031,47 +1031,84 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                // Build a name-to-price map (use first variation price)
-                var priceMap = {};
+                // Build maps for price and inventory status
+                var itemMap = {};
                 data.items.forEach(function(item) {
-                    var name = item.name.trim();
+                    var name = item.name.trim().toLowerCase();
+                    var price = null;
                     if (item.variations && item.variations.length > 0) {
                         var v = item.variations[0];
                         if (v.priceMoney && v.priceMoney.amount) {
-                            priceMap[name.toLowerCase()] = formatCents(v.priceMoney.amount);
+                            price = formatCents(v.priceMoney.amount);
                         }
                     }
+                    itemMap[name] = {
+                        price: price,
+                        isSoldOut: item.isSoldOut || false,
+                        isLowStock: item.isLowStock || false,
+                        totalQuantity: item.totalQuantity || 0
+                    };
                 });
 
                 // Update all elements with data-square-item attributes
                 var matched = 0;
-                var soldOut = 0;
+                var soldOutCount = 0;
+                var lowStockCount = 0;
                 var unmatched = [];
                 document.querySelectorAll('[data-square-item]').forEach(function(el) {
                     var itemName = el.getAttribute('data-square-item').toLowerCase();
                     var priceEl = el.querySelector('.price');
-                    var isSoldOut = priceEl && priceEl.classList.contains('sold-out');
+                    var itemData = itemMap[itemName];
 
-                    if (isSoldOut) {
-                        soldOut++;
-                        return; // Skip sold-out items entirely
-                    }
+                    // Remove any existing stock badge
+                    var existingBadge = el.querySelector('.stock-badge');
+                    if (existingBadge) existingBadge.remove();
 
-                    if (priceMap[itemName]) {
-                        if (priceEl) {
-                            priceEl.textContent = priceMap[itemName];
-                            matched++;
+                    if (itemData) {
+                        matched++;
+
+                        // Handle sold out status
+                        if (itemData.isSoldOut) {
+                            soldOutCount++;
+                            el.classList.add('sold-out-item');
+                            if (priceEl) {
+                                priceEl.classList.add('sold-out');
+                                priceEl.textContent = 'Sold Out';
+                            }
+                        } else {
+                            el.classList.remove('sold-out-item');
+                            if (priceEl) {
+                                priceEl.classList.remove('sold-out');
+                                if (itemData.price) {
+                                    priceEl.textContent = itemData.price;
+                                }
+                            }
+
+                            // Handle low stock status
+                            if (itemData.isLowStock) {
+                                lowStockCount++;
+                                var badge = document.createElement('span');
+                                badge.className = 'stock-badge low-stock';
+                                badge.textContent = 'Low Stock';
+                                // Insert badge before price
+                                if (priceEl) {
+                                    priceEl.parentNode.insertBefore(badge, priceEl);
+                                }
+                            }
                         }
                     } else {
                         unmatched.push(el.getAttribute('data-square-item'));
                     }
                 });
 
-                var totalSiteItems = document.querySelectorAll('[data-square-item]').length - soldOut;
+                var totalSiteItems = document.querySelectorAll('[data-square-item]').length;
                 var details = '<span>' + data.items.length + ' catalog items fetched</span>' +
-                    '<span>' + matched + '/' + totalSiteItems + ' site prices updated</span>';
-                if (soldOut > 0) {
-                    details += '<span>' + soldOut + ' sold-out items skipped</span>';
+                    '<span>' + matched + '/' + totalSiteItems + ' site items matched</span>';
+                if (soldOutCount > 0) {
+                    details += '<span class="square-status-warning">' + soldOutCount + ' sold out</span>';
+                }
+                if (lowStockCount > 0) {
+                    details += '<span class="square-status-warning">' + lowStockCount + ' low stock</span>';
                 }
                 if (data.updatedAt) {
                     var d = new Date(data.updatedAt);
@@ -1082,7 +1119,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 updateSquareStatus('connected', 'Connected', details);
-                console.log('Prices updated from Square catalog (' + Object.keys(priceMap).length + ' items)');
+                console.log('Prices updated from Square catalog (' + Object.keys(itemMap).length + ' items, ' + soldOutCount + ' sold out, ' + lowStockCount + ' low stock)');
             })
             .catch(function(err) {
                 updateSquareStatus('error', 'Offline', '<span>Error: ' + err.message + '</span><span>Prices showing hardcoded defaults.</span>');

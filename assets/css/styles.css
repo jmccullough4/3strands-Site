@@ -895,6 +895,32 @@ main,
     font-style: italic;
 }
 
+.sold-out-item {
+    opacity: 0.6;
+}
+
+.sold-out-item span:first-child {
+    text-decoration: line-through;
+    text-decoration-color: var(--color-gray-400);
+}
+
+.stock-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    margin-right: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.stock-badge.low-stock {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffc107;
+}
+
 .products-cta {
     text-align: center;
 }
