@@ -203,10 +203,13 @@ function fetchInventoryCounts(catalogObjectIds) {
 
     return batches.reduce(function (promiseChain, batch) {
         return promiseChain.then(function () {
-            return squareClient.inventory.batchGetCounts({
+            // Square SDK v44 uses inventory.batchRetrieveInventoryCounts
+            return squareClient.inventory.batchRetrieveInventoryCounts({
                 catalogObjectIds: batch
             }).then(function (response) {
-                var counts = response.counts || [];
+                // SDK returns data in response.result or response directly
+                var counts = response.result?.counts || response.counts || [];
+                console.log('Inventory batch returned ' + counts.length + ' counts');
                 counts.forEach(function (count) {
                     var qty = parseFloat(count.quantity || '0');
                     var objId = count.catalogObjectId;
@@ -219,6 +222,7 @@ function fetchInventoryCounts(catalogObjectIds) {
             });
         });
     }, Promise.resolve()).then(function () {
+        console.log('Total inventory counts retrieved: ' + Object.keys(inventoryCounts).length);
         return inventoryCounts;
     });
 }
@@ -258,18 +262,34 @@ app.get('/api/catalog', function (req, res) {
 
             // Fetch inventory counts
             return fetchInventoryCounts(allVariationIds).then(function (inventoryCounts) {
+                var hasInventoryData = Object.keys(inventoryCounts).length > 0;
+
                 // Attach inventory and stock status to items
                 items.forEach(function (item) {
                     var totalQuantity = 0;
+                    var hasTrackedInventory = false;
+
                     item.variations.forEach(function (v) {
-                        var qty = inventoryCounts[v.id] || 0;
+                        // Check if this variation has inventory tracking
+                        var isTracked = inventoryCounts.hasOwnProperty(v.id);
+                        var qty = isTracked ? inventoryCounts[v.id] : null;
+
                         v.quantity = qty;
-                        v.isSoldOut = qty <= 0;
-                        totalQuantity += qty;
+                        // Only mark as sold out if inventory is tracked AND qty <= 0
+                        v.isSoldOut = isTracked && qty <= 0;
+
+                        if (isTracked) {
+                            hasTrackedInventory = true;
+                            totalQuantity += qty;
+                        }
                     });
-                    item.totalQuantity = totalQuantity;
-                    item.isSoldOut = item.variations.every(function (v) { return v.isSoldOut; });
-                    item.isLowStock = totalQuantity > 0 && totalQuantity <= LOW_STOCK_THRESHOLD;
+
+                    item.totalQuantity = hasTrackedInventory ? totalQuantity : null;
+                    // Only mark item as sold out if it has tracked inventory and all variations are sold out
+                    item.isSoldOut = hasTrackedInventory && item.variations.every(function (v) {
+                        return inventoryCounts.hasOwnProperty(v.id) && v.isSoldOut;
+                    });
+                    item.isLowStock = hasTrackedInventory && totalQuantity > 0 && totalQuantity <= LOW_STOCK_THRESHOLD;
 
                     // Attach category names
                     if (item.category && categories[item.category]) {
