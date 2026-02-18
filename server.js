@@ -12,6 +12,9 @@ var DATA_DIR = path.join(__dirname, 'data');
 var EVENTS_FILE = path.join(DATA_DIR, 'events.json');
 var SUBSCRIBERS_FILE = path.join(DATA_DIR, 'subscribers.json');
 
+// Dashboard API URL (source of truth for flash sales, managed via iOS app)
+var DASHBOARD_URL = process.env.DASHBOARD_URL || 'http://localhost:8081';
+
 // Ensure data directory exists
 if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR);
@@ -38,6 +41,40 @@ function readSubscribers() {
 
 function writeSubscribers(subs) {
     fs.writeFileSync(SUBSCRIBERS_FILE, JSON.stringify(subs, null, 2));
+}
+
+// =========================================================================
+// Dashboard API helpers (flash sales come from dashboard_trailer)
+// =========================================================================
+var flashSalesCache = null;
+var flashSalesCacheTime = 0;
+var FLASH_SALES_CACHE_DURATION = 30 * 1000; // 30 seconds
+
+function fetchFlashSalesFromDashboard() {
+    var now = Date.now();
+    if (flashSalesCache && (now - flashSalesCacheTime) < FLASH_SALES_CACHE_DURATION) {
+        console.log('Returning cached flash sales:', flashSalesCache.length, 'items');
+        return Promise.resolve(flashSalesCache);
+    }
+
+    console.log('Fetching flash sales from:', DASHBOARD_URL + '/api/public/flash-sales');
+    return fetch(DASHBOARD_URL + '/api/public/flash-sales')
+        .then(function (res) {
+            console.log('Dashboard response status:', res.status);
+            if (!res.ok) throw new Error('Dashboard returned ' + res.status);
+            return res.json();
+        })
+        .then(function (sales) {
+            console.log('Received flash sales:', sales.length, 'items');
+            flashSalesCache = sales;
+            flashSalesCacheTime = now;
+            return sales;
+        })
+        .catch(function (err) {
+            console.error('Failed to fetch flash sales from dashboard:', err.message);
+            // Return cached data if available, otherwise empty array
+            return flashSalesCache || [];
+        });
 }
 
 // =========================================================================
@@ -561,7 +598,23 @@ app.post('/api/events', function (req, res) {
     }
 });
 
+// =========================================================================
+// Flash Sales API (proxied from dashboard_trailer)
+// =========================================================================
+
+// GET /api/flash-sales - Returns active flash sales from dashboard
+app.get('/api/flash-sales', function (req, res) {
+    fetchFlashSalesFromDashboard()
+        .then(function (sales) {
+            res.json(sales);
+        })
+        .catch(function (err) {
+            res.status(500).json({ error: 'Failed to fetch flash sales', message: err.message });
+        });
+});
+
 app.listen(PORT, function () {
     console.log('3 Strands running on http://localhost:' + PORT);
     console.log('Square environment: ' + process.env.SQUARE_ENVIRONMENT);
+    console.log('Dashboard URL: ' + DASHBOARD_URL);
 });
