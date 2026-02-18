@@ -719,7 +719,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('calendar-modal').style.display = 'flex';
                 document.body.style.overflow = 'hidden';
                 renderCalendar();
-                updatePricesFromSquare();
+                loadProducts();
             } else {
                 document.getElementById('admin-login-status').textContent = 'Invalid credentials.';
             }
@@ -992,15 +992,96 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================================
-    // Square Catalog Price Sync
+    // Product Categories - Menu Board Organization (matches Dashboard)
+    // =========================================================================
+    var productCategories = {
+        'Premium Steaks': {
+            keywords: ['filet mignon', 'ribeye', 'ny strip', 'porterhouse', 'sirloin cap', 'picanha']
+        },
+        'Everyday Steaks': {
+            keywords: ['flank steak', 'skirt steak', 'denver steak', 'chuck eye', 'flat iron', 'hanger', 'london broil', 'petite sirloin', 'sirloin tip steak', 'sirloin flap', 'teres major']
+        },
+        'Roasts': {
+            keywords: ['roast', 'brisket', 'tri tip']
+        },
+        'Ground & Stew': {
+            keywords: ['ground beef', 'stew meat']
+        },
+        'Specialty Cuts': {
+            keywords: ['oxtail', 'short rib', 'osso bucco', 'beef belly']
+        },
+        'Bones & Offal': {
+            keywords: ['bone', 'liver', 'heart', 'tongue']
+        },
+        'Farm Fresh': {
+            keywords: ['egg', 'duck']
+        }
+    };
+
+    // Category display order (matches Dashboard)
+    var categoryOrder = [
+        'Premium Steaks',
+        'Everyday Steaks',
+        'Roasts',
+        'Ground & Stew',
+        'Specialty Cuts',
+        'Bones & Offal',
+        'Farm Fresh'
+    ];
+
+    // Items to exclude from display
+    var excludeItems = ['beef home delivery', 'beef pickup', 'shipping', 'market appearance'];
+
+    function categorizeProduct(productName) {
+        var nameLower = productName.toLowerCase();
+        if (excludeItems.some(function(ex) { return nameLower.includes(ex); })) {
+            return null;
+        }
+        for (var category in productCategories) {
+            if (productCategories[category].keywords.some(function(kw) { return nameLower.includes(kw); })) {
+                return category;
+            }
+        }
+        return null; // Don't show uncategorized items
+    }
+
+    // Sort order within categories (premium items first)
+    function getProductSortOrder(name) {
+        var nameLower = name.toLowerCase();
+        var premiumOrder = [
+            'filet mignon', 'ribeye', 'porterhouse', 'ny strip', 'sirloin cap', 'picanha',
+            'brisket', 'tri tip', 'chuck roast'
+        ];
+        for (var i = 0; i < premiumOrder.length; i++) {
+            if (nameLower.includes(premiumOrder[i])) return i;
+        }
+        return 999;
+    }
+
+    // =========================================================================
+    // Square Catalog & Flash Sales - Dynamic Rendering
     // =========================================================================
     var SQUARE_API_URL = window.SQUARE_API_URL || '/api/catalog';
+    // Fetch flash sales via server proxy (avoids CORS issues)
+    var FLASH_SALES_API_URL = window.FLASH_SALES_API_URL || '/api/flash-sales';
 
     function formatCents(amount) {
         return '$' + (amount / 100).toFixed(2);
     }
 
+    function formatPrice(amount) {
+        return '$' + amount.toFixed(2);
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        var div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
     var lastSquareData = null;
+    var lastFlashSales = [];
 
     function updateSquareStatus(status, message, details) {
         var dot = document.getElementById('square-status-dot');
@@ -1015,128 +1096,244 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function updatePricesFromSquare() {
-        updateSquareStatus('checking', 'Checking...', '');
+    function loadProducts() {
+        var container = document.getElementById('products-container');
+        if (!container) return;
 
-        fetch(SQUARE_API_URL)
-            .then(function(res) {
-                if (!res.ok) throw new Error('API returned ' + res.status);
-                return res.json();
+        // Fetch both catalog and flash sales in parallel
+        console.log('Fetching catalog from:', SQUARE_API_URL);
+        console.log('Fetching flash sales from:', FLASH_SALES_API_URL);
+        Promise.all([
+            fetch(SQUARE_API_URL).then(function(r) { return r.json(); }),
+            fetch(FLASH_SALES_API_URL).then(function(r) {
+                console.log('Flash sales response status:', r.status);
+                return r.json();
+            }).catch(function(err) {
+                console.error('Flash sales fetch error:', err);
+                return [];
             })
-            .then(function(data) {
+        ])
+            .then(function(results) {
+                var data = results[0];
+                var flashSales = results[1] || [];
                 lastSquareData = data;
+                lastFlashSales = flashSales;
 
-                if (!data.items || !data.items.length) {
+                console.log('Catalog items:', data.items ? data.items.length : 0);
+                console.log('Flash sales received:', flashSales.length, flashSales);
+
+                var catalog = data.items || [];
+
+                if (!catalog || catalog.length === 0) {
+                    container.innerHTML = '<div class="products-loading"><p>No products available. Check back soon!</p></div>';
                     updateSquareStatus('warning', 'Connected — No Items', 'The API responded but returned no catalog items.');
                     return;
                 }
 
-                // Build maps for price and inventory status
-                var itemMap = {};
-                data.items.forEach(function(item) {
-                    var name = item.name.trim().toLowerCase();
-                    var price = null;
+                // Build flash sale lookup map (by cut_type)
+                var flashSaleMap = {};
+                flashSales.forEach(function(sale) {
+                    if (sale.is_active !== false) {
+                        var key = sale.cut_type.toLowerCase().replace(/\s+/g, '');
+                        flashSaleMap[key] = sale;
+                        console.log('Flash sale map key:', key, '-> sale:', sale.cut_type);
+                    }
+                });
+
+                // Categorize and organize products
+                var categorizedProducts = {};
+
+                catalog.forEach(function(item) {
+                    var name = item.name.trim();
+                    var category = categorizeProduct(name);
+                    if (category === null) return; // Skip excluded/uncategorized items
+
+                    if (!categorizedProducts[category]) {
+                        categorizedProducts[category] = [];
+                    }
+
+                    // Get price from first variation
+                    var priceCents = 0;
                     if (item.variations && item.variations.length > 0) {
                         var v = item.variations[0];
                         if (v.priceMoney && v.priceMoney.amount) {
-                            price = formatCents(v.priceMoney.amount);
+                            priceCents = v.priceMoney.amount;
                         }
                     }
-                    itemMap[name] = {
-                        price: price,
+
+                    // Check for flash sale match
+                    var nameLower = name.toLowerCase();
+                    var productKey = nameLower.replace(/\s+/g, '');
+                    var matchedSale = null;
+                    for (var key in flashSaleMap) {
+                        if (productKey.includes(key) || key.includes(productKey)) {
+                            matchedSale = flashSaleMap[key];
+                            console.log('Flash sale MATCH:', name, '-> key:', key);
+                            break;
+                        }
+                    }
+
+                    categorizedProducts[category].push({
+                        name: name,
+                        priceCents: priceCents,
                         isSoldOut: item.isSoldOut || false,
                         isLowStock: item.isLowStock || false,
-                        totalQuantity: item.totalQuantity || 0
-                    };
+                        flashSale: matchedSale
+                    });
                 });
 
-                // Update all elements with data-square-item attributes
-                var matched = 0;
-                var soldOutCount = 0;
-                var lowStockCount = 0;
-                var unmatched = [];
-                document.querySelectorAll('[data-square-item]').forEach(function(el) {
-                    var itemName = el.getAttribute('data-square-item').toLowerCase();
-                    var priceEl = el.querySelector('.price');
-                    var itemData = itemMap[itemName];
+                // Sort products within each category
+                for (var cat in categorizedProducts) {
+                    categorizedProducts[cat].sort(function(a, b) {
+                        // Sold out items go to the bottom
+                        if (a.isSoldOut && !b.isSoldOut) return 1;
+                        if (!a.isSoldOut && b.isSoldOut) return -1;
+                        // Low stock items go just above sold out
+                        if (a.isLowStock && !b.isLowStock && !b.isSoldOut) return 1;
+                        if (!a.isLowStock && b.isLowStock && !a.isSoldOut) return -1;
+                        // Flash sales first (among in-stock items)
+                        if (a.flashSale && !b.flashSale) return -1;
+                        if (!a.flashSale && b.flashSale) return 1;
+                        // Then by premium order
+                        var orderA = getProductSortOrder(a.name);
+                        var orderB = getProductSortOrder(b.name);
+                        if (orderA !== orderB) return orderA - orderB;
+                        // Then alphabetically
+                        return a.name.localeCompare(b.name);
+                    });
+                }
 
-                    // Remove any existing stock badge
-                    var existingBadge = el.querySelector('.stock-badge');
-                    if (existingBadge) existingBadge.remove();
+                // Render the product categories
+                var html = '';
 
-                    if (itemData) {
-                        matched++;
+                categoryOrder.forEach(function(category) {
+                    var products = categorizedProducts[category];
+                    if (!products || products.length === 0) return;
 
-                        // Handle sold out status
-                        if (itemData.isSoldOut) {
-                            soldOutCount++;
-                            el.classList.add('sold-out-item');
-                            if (priceEl) {
-                                priceEl.classList.add('sold-out');
-                                priceEl.textContent = 'Sold Out';
-                            }
+                    html += '<div class="category-card">';
+                    html += '<h3>' + escapeHtml(category) + '</h3>';
+                    html += '<ul class="price-list">';
+
+                    products.forEach(function(product) {
+                        var itemClasses = [];
+                        var priceHtml = '';
+
+                        if (product.isSoldOut) {
+                            itemClasses.push('sold-out-item');
+                            priceHtml = '<span class="price sold-out">Sold Out</span>';
+                        } else if (product.flashSale) {
+                            var sale = product.flashSale;
+                            var savings = Math.round(((sale.original_price - sale.sale_price) / sale.original_price) * 100);
+                            itemClasses.push('on-sale');
+                            priceHtml = '<span class="price-original">' + formatPrice(sale.original_price) + '</span>';
+                            priceHtml += '<span class="price sale-price">' + formatPrice(sale.sale_price) + '</span>';
+                            priceHtml += '<span class="price-savings">' + savings + '% OFF</span>';
                         } else {
-                            el.classList.remove('sold-out-item');
-                            if (priceEl) {
-                                priceEl.classList.remove('sold-out');
-                                if (itemData.price) {
-                                    priceEl.textContent = itemData.price;
-                                }
-                            }
-
-                            // Handle low stock status
-                            if (itemData.isLowStock) {
-                                lowStockCount++;
-                                var badge = document.createElement('span');
-                                badge.className = 'stock-badge low-stock';
-                                badge.textContent = 'Low Stock';
-                                // Insert badge before price
-                                if (priceEl) {
-                                    priceEl.parentNode.insertBefore(badge, priceEl);
-                                }
+                            if (product.priceCents > 0) {
+                                priceHtml = '<span class="price">' + formatCents(product.priceCents) + '</span>';
+                                priceHtml += '<span class="price-unit">/lb</span>';
+                            } else {
+                                priceHtml = '<span class="price">Market Price</span>';
                             }
                         }
-                    } else {
-                        unmatched.push(el.getAttribute('data-square-item'));
-                    }
+
+                        // Add stock badge (after name)
+                        var stockBadgeHtml = '';
+                        if (product.isLowStock && !product.isSoldOut) {
+                            itemClasses.push('low-stock-item');
+                            stockBadgeHtml = ' <span class="stock-badge low-stock">Low Stock</span>';
+                        }
+
+                        // Flash sale badge (before item name)
+                        var flashBadgeHtml = '';
+                        if (product.flashSale && !product.isSoldOut) {
+                            flashBadgeHtml = '<span class="flash-badge">⚡ FLASH SALE</span>';
+                        }
+
+                        html += '<li class="' + itemClasses.join(' ') + '">';
+                        html += flashBadgeHtml;
+                        html += '<span class="item-name">' + escapeHtml(product.name) + stockBadgeHtml + '</span>';
+                        html += '<span class="item-pricing">' + priceHtml + '</span>';
+                        html += '</li>';
+                    });
+
+                    html += '</ul>';
+                    html += '</div>';
                 });
 
-                var totalSiteItems = document.querySelectorAll('[data-square-item]').length;
-                var details = '<span>' + data.items.length + ' catalog items fetched</span>' +
-                    '<span>' + matched + '/' + totalSiteItems + ' site items matched</span>';
-                if (soldOutCount > 0) {
-                    details += '<span class="square-status-warning">' + soldOutCount + ' sold out</span>';
+                container.innerHTML = html;
+
+                // Observe newly created category cards for reveal animation
+                if (!prefersReducedMotion) {
+                    container.querySelectorAll('.category-card').forEach(function(card) {
+                        card.classList.add('is-visible');
+                    });
                 }
-                if (lowStockCount > 0) {
-                    details += '<span class="square-status-warning">' + lowStockCount + ' low stock</span>';
+
+                // Update flash sales banner
+                updateFlashSalesBanner(flashSales);
+
+                // Update status
+                var flashSaleCount = flashSales.length;
+                var details = '<span>' + catalog.length + ' catalog items</span>';
+                if (flashSaleCount > 0) {
+                    details += '<span class="square-status-sale">⚡ ' + flashSaleCount + ' flash sale' + (flashSaleCount > 1 ? 's' : '') + '</span>';
                 }
                 if (data.updatedAt) {
                     var d = new Date(data.updatedAt);
                     details += '<span>Last sync: ' + d.toLocaleTimeString() + '</span>';
                 }
-                if (unmatched.length > 0) {
-                    details += '<span class="square-status-warning">Unmatched: ' + unmatched.join(', ') + '</span>';
-                }
 
                 updateSquareStatus('connected', 'Connected', details);
-                console.log('Prices updated from Square catalog (' + Object.keys(itemMap).length + ' items, ' + soldOutCount + ' sold out, ' + lowStockCount + ' low stock)');
+                console.log('Products loaded from catalog (' + catalog.length + ' items, ' + flashSaleCount + ' flash sales)');
             })
             .catch(function(err) {
-                updateSquareStatus('error', 'Offline', '<span>Error: ' + err.message + '</span><span>Prices showing hardcoded defaults.</span>');
-                console.log('Square catalog fetch skipped:', err.message);
+                container.innerHTML = '<div class="products-loading"><p>Unable to load products. Please try again later.</p></div>';
+                updateSquareStatus('error', 'Offline', '<span>Error: ' + err.message + '</span>');
+                console.error('Catalog fetch failed:', err.message);
             });
+    }
+
+    // =========================================================================
+    // Flash Sales Banner
+    // =========================================================================
+    function updateFlashSalesBanner(flashSales) {
+        var banner = document.getElementById('flash-sales-banner');
+        if (!banner) return;
+
+        if (!flashSales || flashSales.length === 0) {
+            banner.style.display = 'none';
+            return;
+        }
+
+        var html = '<div class="flash-banner-content">';
+        html += '<span class="flash-banner-icon">⚡</span>';
+        html += '<span class="flash-banner-label">FLASH SALE</span>';
+        html += '<div class="flash-banner-items">';
+        flashSales.forEach(function(sale) {
+            var savings = Math.round(((sale.original_price - sale.sale_price) / sale.original_price) * 100);
+            html += '<span class="flash-banner-item">';
+            html += '<strong>' + escapeHtml(sale.cut_type) + '</strong> ';
+            html += '<span class="flash-original">' + formatPrice(sale.original_price) + '</span> ';
+            html += '<span class="flash-sale-price">' + formatPrice(sale.sale_price) + '</span> ';
+            html += '<span class="flash-savings">' + savings + '% OFF</span>';
+            html += '</span>';
+        });
+        html += '</div></div>';
+        banner.innerHTML = html;
+        banner.style.display = 'block';
     }
 
     // Refresh button
     var refreshBtn = document.getElementById('square-refresh-btn');
     if (refreshBtn) {
         refreshBtn.addEventListener('click', function() {
-            updatePricesFromSquare();
+            loadProducts();
         });
     }
 
-    // Fetch prices on page load
-    updatePricesFromSquare();
+    // Load products on page load
+    loadProducts();
 
     // Smart polling — refresh every 60s while tab is visible, pause when hidden
     var POLL_INTERVAL = 60 * 1000;
@@ -1144,7 +1341,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function startPolling() {
         if (pollTimer) return;
-        pollTimer = setInterval(updatePricesFromSquare, POLL_INTERVAL);
+        pollTimer = setInterval(loadProducts, POLL_INTERVAL);
     }
 
     function stopPolling() {
@@ -1160,7 +1357,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (document.hidden) {
             stopPolling();
         } else {
-            updatePricesFromSquare();
+            loadProducts();
             startPolling();
         }
     });

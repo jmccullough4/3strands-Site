@@ -5,6 +5,10 @@ services:
       - "8083:8083"
     env_file:
       - .env
+    environment:
+      - DASHBOARD_URL=http://host.docker.internal:8081
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./data:/app/data
     restart: unless-stopped
