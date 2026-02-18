@@ -95,11 +95,10 @@ body {
 body::before {
     content: '';
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 60vmin;
-    height: 60vmin;
+    top: 80px;
+    right: 20px;
+    width: 200px;
+    height: 200px;
     background-image: url('../img/logo.png');
     background-size: contain;
     background-repeat: no-repeat;
