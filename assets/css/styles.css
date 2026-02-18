@@ -325,7 +325,7 @@ main,
 }
 
 .brand-name {
-    font-family: var(--font-display);
+    font-family: var(--font-body);
     font-size: 1.125rem;
     font-weight: 600;
     color: var(--color-gray-900);
@@ -2318,7 +2318,7 @@ main,
 }
 
 .footer-name {
-    font-family: var(--font-display);
+    font-family: var(--font-body);
     font-weight: 600;
     color: var(--color-white);
     margin-bottom: var(--space-xs);
