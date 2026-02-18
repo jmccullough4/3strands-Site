@@ -92,20 +92,32 @@ body {
 }
 
 /* Floating Logo Watermark */
-body::before {
+body::after {
     content: '';
     position: fixed;
     top: 80px;
     right: 20px;
-    width: 200px;
-    height: 200px;
+    width: 25vw;
+    height: 25vw;
+    min-width: 120px;
+    min-height: 120px;
+    max-width: 375px;
+    max-height: 375px;
     background-image: url('../img/logo.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
     opacity: 0.08;
     pointer-events: none;
-    z-index: 0;
+    z-index: 10;
+    mix-blend-mode: multiply;
+}
+
+/* Hide watermark on small screens to avoid clutter */
+@media (max-width: 480px) {
+    body::after {
+        display: none;
+    }
 }
 
 img {
@@ -283,7 +295,7 @@ main,
 .site-header,
 .site-footer {
     position: relative;
-    z-index: 1;
+    z-index: 2;
 }
 
 .site-header {
@@ -520,6 +532,7 @@ main,
     justify-content: center;
     background: linear-gradient(145deg, var(--color-gray-900) 0%, var(--color-primary-dark) 50%, var(--color-gray-800) 100%);
     overflow: hidden;
+    z-index: 2;
 }
 
 .beef-story-overlay {
@@ -652,6 +665,7 @@ main,
     padding: var(--space-4xl) 0;
     position: relative;
     overflow: hidden;
+    z-index: 2;
 }
 
 .hero::after {
@@ -820,6 +834,8 @@ main,
 .products {
     padding: var(--space-4xl) 0;
     background: var(--color-cream);
+    position: relative;
+    z-index: 2;
 }
 
 .product-categories {
@@ -835,6 +851,8 @@ main,
     padding: var(--space-xl);
     border: 1px solid var(--color-sand);
     transition: transform var(--transition-base), box-shadow var(--transition-base);
+    position: relative;
+    z-index: 2;
 }
 
 .category-card:hover {
@@ -1092,11 +1110,13 @@ main,
     text-decoration: line-through;
     color: var(--color-gray-400);
     font-size: 0.85rem;
+    margin-right: 0.5rem;
 }
 
 .price.sale-price {
     color: #dc2626;
     font-weight: 700;
+    margin-right: 0.5rem;
     font-size: 1.05rem;
 }
 
@@ -1300,6 +1320,8 @@ main,
     padding: var(--space-4xl) 0;
     background: linear-gradient(135deg, var(--color-gray-800) 0%, var(--color-gray-900) 100%);
     color: var(--color-cream);
+    position: relative;
+    z-index: 2;
 }
 
 .bulk-grid {
@@ -1420,6 +1442,8 @@ main,
 .subscriptions {
     padding: var(--space-4xl) 0;
     background: var(--color-cream);
+    position: relative;
+    z-index: 2;
 }
 
 /* Mystery Cooler */
@@ -1530,6 +1554,8 @@ main,
 .about {
     padding: var(--space-4xl) 0;
     background: var(--color-sand);
+    position: relative;
+    z-index: 2;
 }
 
 .about-grid {
@@ -2003,6 +2029,8 @@ main,
     padding: var(--space-3xl) 0;
     background: var(--color-primary);
     color: var(--color-cream);
+    position: relative;
+    z-index: 2;
 }
 
 .newsletter-content {
@@ -2062,6 +2090,8 @@ main,
 .order-section {
     padding: var(--space-4xl) 0;
     background: var(--color-ivory);
+    position: relative;
+    z-index: 2;
 }
 
 .order-options {
@@ -2156,6 +2186,8 @@ main,
 .contact {
     padding: var(--space-4xl) 0;
     background: var(--color-cream);
+    position: relative;
+    z-index: 2;
 }
 
 .contact-grid {
@@ -2297,6 +2329,8 @@ main,
     background: var(--color-gray-900);
     color: var(--color-khaki);
     padding: var(--space-3xl) 0 var(--space-xl);
+    position: relative;
+    z-index: 2;
 }
 
 .footer-grid {
